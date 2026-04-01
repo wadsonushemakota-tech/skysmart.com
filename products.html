@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Sky Smart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="products.css">
+</head>
+<body>
+    <div class="main">
+        <div class="navbar">
+            <div class="icon">
+                <h2 class="logo"><a href="index.html">Sky Smart</a></h2>
+            </div>
+
+            <div class="menu">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="index.html#about">ABOUT</a></li>
+                    <li><a href="products.html" class="active">PRODUCTS</a></li>
+                    <li><a href="index.html#contact">CONTACT</a></li>
+                </ul>
+            </div>
+
+            <div class="search">
+                <input class="srch" type="search" name="" placeholder="Search products...">
+                <a href="products.html"> <button class="btn">Search</button></a>
+            </div>
+        </div>
+
+        <div class="products-hero">
+            <h1>Our Premium Collection</h1>
+            <p>Discover the latest trends in sneakers and footwear</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2> Shop By Category</h2>
+        <div class="category-filters">
+            <button onclick="filterProducts('all')" class="filter-btn active">All Products</button>
+            <button onclick="filterProducts('jordans')" class="filter-btn">Jordan Shoes</button>
+            <button onclick="filterProducts('nike')" class="filter-btn">Nike Shoes</button>
+            <button onclick="filterProducts('adidas')" class="filter-btn">Adidas</button>
+            <button onclick="filterProducts('sneakers')" class="filter-btn">Sneakers</button>
+            <button onclick="filterProducts('lifestyle')" class="filter-btn">Lifestyle</button>
+            <button onclick="filterProducts('schoolwear')" class="filter-btn">School Wear</button>
+        </div>
+
+        <!-- Category Banner Section -->
+        <div id="category-banner" class="category-banner" style="display: none;">
+            <div class="banner-content">
+                <img id="category-image" src="" alt="Category Image" class="category-main-image">
+                <div class="banner-text">
+                    <h3 id="category-title">Category Title</h3>
+                    <p id="category-description">Category description</p>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <div id="productsGrid" class="products-grid">
+        <!-- Products will be loaded dynamically from PostgreSQL -->
+        <div class="loading">Loading products...</div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="product-modal" style="display:none;">
+        <div class="product-modal-content">
+            <div class="product-modal-header">
+                <h2 id="modal-title">Product Details</h2>
+                <span class="close-modal" id="close-product-modal">&times;</span>
+            </div>
+            <div class="product-modal-body">
+                <div class="modal-image-container">
+                    <img id="modal-image" src="" alt="Product Image" class="modal-main-image">
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoom-in">+</button>
+                        <button class="zoom-btn" id="zoom-out">-</button>
+                        <button class="zoom-btn" id="reset-zoom">Reset</button>
+                    </div>
+                </div>
+                <div class="modal-product-info">
+                    <h3 id="modal-product-name"></h3>
+                    <p class="modal-price" id="modal-price"></p>
+                    <div class="size-selection">
+                        <h4>Select Size:</h4>
+                        <div class="size-buttons">
+                            <button class="size-btn">7</button>
+                            <button class="size-btn">8</button>
+                            <button class="size-btn">9</button>
+                            <button class="size-btn">10</button>
+                            <button class="size-btn">11</button>
+                            <button class="size-btn">12</button>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="modal-add-to-cart" id="modal-add-to-cart">Add to Cart</button>
+                        <button class="modal-wishlist" id="modal-wishlist">
+                            <span class="wishlist-icon">❤️</span>
+                            <span class="wishlist-text">Add to Wishlist</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Back Home Button -->
+    <div class="floating-back-home">
+        <a href="index.html" class="floating-btn" title="Back to Home">
+            <span class="btn-icon">🏠</span>
+            <span class="btn-text">HOME</span>
+        </a>
+    </div>
+
+    <button class="checkout-fab" id="open-checkout">
+        <span class="btn-icon">💳</span>
+        <span class="btn-text">Checkout</span>
+    </button>
+
+    <div id="checkout-modal" class="checkout-modal" style="display:none;">
+        <div class="checkout-content">
+            <div class="checkout-header">
+                <h2>Checkout</h2>
+                <span class="close-checkout" id="close-checkout">&times;</span>
+            </div>
+            <div class="checkout-body">
+                <div class="checkout-total" id="checkout-total"></div>
+                <div class="payment-options">
+                    <div class="payment-card" id="option-bank" data-method="bank">
+                        <div class="payment-title">
+                            <span>🏦</span>
+                            <span>Pay with Bank</span>
+                        </div>
+                        <div class="payment-details" id="bank-details" style="display:none;">
+                            <div>Account Name: Wadson Ushemakota</div>
+                            <div>Bank: BancABC</div>
+                            <div>Branch Code: K53</div>
+                            <div>ZWG Account: 92351443311235</div>
+                            <div>USD Account: 92351448402134</div>
+                        </div>
+                    </div>
+                    <div class="payment-card" id="option-ecocash" data-method="ecocash">
+                        <div class="payment-title">
+                            <span>📱</span>
+                            <span>Pay with EcoCash</span>
+                        </div>
+                        <div class="payment-details" id="ecocash-details" style="display:none;">
+                            <div class="ecocash-number">
+                                <span>0777076575</span>
+                                <button class="copy-btn" id="copy-ecocash">Copy</button>
+                            </div>
+                            <div style="margin-top:8px; font-size:14px;">Use the number above in your EcoCash app.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout-actions">
+                    <div id="selected-method-label">Select a payment method</div>
+                    <button class="confirm-pay-btn" id="confirm-payment">Confirm & Pay</button>
+                </div>
+                <div class="checkout-instructions" id="checkout-instructions" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Sky Smart. All Rights Reserved.</p>
+    </footer>
+
+    <script src="/api-config.js"></script>
+    <script src="/api-base.js"></script>
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+    <script src="products.js"></script>
+</body>
+</html>

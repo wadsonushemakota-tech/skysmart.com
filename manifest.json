@@ -1,0 +1,12 @@
+{
+  "name": "Sky Smart — Fashion & Footwear",
+  "short_name": "Sky Smart",
+  "description": "Shop sneakers, streetwear, and lifestyle picks. Install for a focused app experience.",
+  "start_url": "/store",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "fashion"]
+}

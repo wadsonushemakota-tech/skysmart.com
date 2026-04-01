@@ -1,0 +1,8 @@
+# Railway: set environment variables in the dashboard (see README Deploy section).
+# Optional: pin health check path after deploy.
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30

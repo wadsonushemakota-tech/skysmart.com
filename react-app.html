@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Smart - React E-Commerce</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo h2 {
+            cursor: pointer;
+            margin: 0;
+            color: #3498db;
+        }
+
+        .menu ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .menu a.active,
+        .menu a:hover {
+            background: #3498db;
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .cart-icon, .wishlist-icon {
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .cart-icon:hover, .wishlist-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .cart-count, .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        main {
+            margin-top: 80px;
+            min-height: calc(100vh - 160px);
+        }
+
+        .products-hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('images/1.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .products-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .products-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .category-section {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 20px;
+        }
+
+        .category-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .category-banner {
+            margin-top: 2rem;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .banner-content {
+            position: relative;
+            height: 300px;
+        }
+
+        .category-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+        }
+
+        .banner-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 2rem;
+            color: white;
+        }
+
+        .banner-text h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .banner-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            max-width: 600px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 0 auto;
+            max-width: 1400px;
+            padding: 0 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            overflow: hidden;
+        }
+
+        .product-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image-container img {
+            transform: scale(1.05);
+        }
+
+        .product-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-overlay {
+            opacity: 1;
+        }
+
+        .quick-view-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-view-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-info h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .rating-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .original-price {
+            font-size: 1.2rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart-btn {
+            flex: 2;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 0.875rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #229954, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+
+        .wishlist-btn {
+            flex: 1;
+            background: transparent;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+            padding: 0.875rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wishlist-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        .wishlist-btn.added {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .product-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.new { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .badge.bestseller { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .badge.featured { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+        .badge.limited { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+        .badge.popular { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #333; }
+        .badge.trending { background: linear-gradient(135deg, #ffecd2, #fcb69f); color: #333; }
+        .badge.premium { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #333; }
+        .badge.classic { background: linear-gradient(135deg, #ffdde1, #ee9ca7); color: #333; }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .notification-content {
+            background: #27ae60;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .notification.error .notification-content { background: #e74c3c; }
+        .notification.info .notification-content { background: #3498db; }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            margin-left: auto;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .products-hero h1 { font-size: 2rem; }
+            .category-filters { gap: 0.5rem; }
+            .filter-btn { padding: 0.6rem 1.2rem; font-size: 14px; min-width: 120px; }
+            .products-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; padding: 0 15px; }
+            .product-info { padding: 1rem; }
+            .product-info h3 { font-size: 1.2rem; }
+            .current-price { font-size: 1.4rem; }
+            .product-actions { flex-direction: column; }
+            .add-to-cart-btn, .wishlist-btn { padding: 0.75rem 1rem; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // React Components
+        const { useState, useEffect } = React;
+
+        // Header Component
+        function Header({ cart, wishlist, navigateTo, currentPage }) {
+            const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+            const wishlistCount = wishlist.length;
+
+            return (
+                React.createElement('header', { className: 'navbar' },
+                    React.createElement('div', { className: 'navbar-container' },
+                        React.createElement('div', { className: 'logo' },
+                            React.createElement('h2', {
+                                onClick: () => navigateTo('home'),
+                                style: { cursor: 'pointer' }
+                            }, 'Sky Smart')
+                        ),
+                        React.createElement('nav', { className: 'menu' },
+                            React.createElement('ul', null,
+                                React.createElement('li', null,
+                                    React.createElement('a', {
+                                        href: '#home',
+                                        className: currentPage === 'home' ? 'active' : '',
+                                        onClick: (e) => {
+                                            e.preventDefault();
+                                            navigateTo('home');
+                                        }
+                                    }, 'HOME')
+                                ),
+                                React.createElement('li', null,
+                                    React.createElement('a', { href: '#about' }, 'ABOUT')
+                                ),
+                                React.createElement('li', null,
+                                    React.createElement('a', {
+                                        href: '#products',
+                                        className: currentPage === 'products' ? 'active' : '',
+                                        onClick: (e) => {
+                                            e.preventDefault();
+                                            navigateTo('products');
+                                        }
+                                    }, 'PRODUCTS')
+                                ),
+                                React.createElement('li', null,
+                                    React.createElement('a', { href: '#contact' }, 'CONTACT')
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: 'navbar-icons' },
+                            React.createElement('div', { className: 'cart-icon' },
+                                React.createElement('span', { className: 'cart-icon-text' }, '🛒'),
+                                cartCount > 0 && React.createElement('span', { className: 'cart-count' }, cartCount)
+                            ),
+                            React.createElement('div', { className: 'wishlist-icon' },
+                                React.createElement('span', { className: 'wishlist-icon-text' }, '❤️'),
+                                wishlistCount > 0 && React.createElement('span', { className: 'wishlist-count' }, wishlistCount)
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        // ProductCard Component
+        function ProductCard({ product, onAddToCart, onAddToWishlist, isInWishlist }) {
+            const [imageLoaded, setImageLoaded] = useState(false);
+
+            const handleImageLoad = () => {
+                setImageLoaded(true);
+            };
+
+            return React.createElement('div', { className: 'product-card' },
+                React.createElement('div', { className: 'product-image-container' },
+                    React.createElement('img', {
+                        src: product.image,
+                        alt: product.name,
+                        onLoad: handleImageLoad,
+                        style: { opacity: imageLoaded ? 1 : 0.5 }
+                    }),
+                    React.createElement('div', { className: 'product-overlay' },
+                        React.createElement('button', { className: 'quick-view-btn' }, 'Quick View')
+                    )
+                ),
+                React.createElement('div', { className: 'product-info' },
+                    React.createElement('h3', null, product.name),
+                    React.createElement('div', { className: 'product-rating' },
+                        React.createElement('span', { className: 'stars' },
+                            '★'.repeat(Math.floor(product.rating)) +
+                            (product.rating % 1 !== 0 ? '☆' : '')
+                        ),
+                        React.createElement('span', { className: 'rating-count' }, `(${product.reviews} reviews)`)
+                    ),
+                    React.createElement('div', { className: 'product-price' },
+                        React.createElement('span', { className: 'current-price' }, `$${product.price}`),
+                        product.originalPrice && React.createElement('span', { className: 'original-price' }, `$${product.originalPrice}`),
+                        product.originalPrice && React.createElement('span', { className: 'discount-badge' },
+                            `-${Math.round((1 - product.price / product.originalPrice) * 100)}%`
+                        )
+                    ),
+                    React.createElement('div', { className: 'product-actions' },
+                        React.createElement('button', {
+                            className: 'add-to-cart-btn',
+                            onClick: () => onAddToCart(product)
+                        },
+                            React.createElement('span', { className: 'cart-icon' }, '🛒'),
+                            'Add to Cart'
+                        ),
+                        React.createElement('button', {
+                            className: `wishlist-btn ${isInWishlist ? 'added' : ''}`,
+                            onClick: () => onAddToWishlist(product)
+                        },
+                            React.createElement('span', { className: 'heart-icon' }, isInWishlist ? '❤️' : '🤍')
+                        )
+                    ),
+                    product.tags && product.tags.length > 0 && React.createElement('div', { className: 'product-badges' },
+                        product.tags.map(tag =>
+                            React.createElement('span', { key: tag, className: `badge ${tag}` },
+                                tag.charAt(0).toUpperCase() + tag.slice(1)
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        // CategoryBanner Component
+        function CategoryBanner({ category }) {
+            const [imageLoaded, setImageLoaded] = useState(false);
+
+            const handleImageLoad = () => {
+                setImageLoaded(true);
+            };
+
+            return React.createElement('div', { className: 'category-banner' },
+                React.createElement('div', { className: 'banner-content' },
+                    React.createElement('img', {
+                        src: category.image,
+                        alt: category.title,
+                        className: 'category-main-image',
+                        onLoad: handleImageLoad,
+                        style: { opacity: imageLoaded ? 1 : 0.5 }
+                    }),
+                    React.createElement('div', { className: 'banner-text' },
+                        React.createElement('h3', null, category.title),
+                        React.createElement('p', null, category.description)
+                    )
+                )
+            );
+        }
+
+        // Notification Component
+        function Notification({ message, type = 'success', onClose }) {
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    onClose();
+                }, 3000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+
+            return React.createElement('div', { className: `notification ${type}` },
+                React.createElement('div', { className: 'notification-content' },
+                    message,
+                    React.createElement('button', {
+                        className: 'notification-close',
+                        onClick: onClose
+                    }, '×')
+                )
+            );
+        }
+
+        // ProductsPage Component
+        function ProductsPage({ cart, wishlist, addToCart, addToWishlist }) {
+            const [activeCategory, setActiveCategory] = useState('all');
+            const [notification, setNotification] = useState(null);
+
+            const products = [
+                { id: 1, name: 'Air Jordan 4 Original', price: 89.99, originalPrice: 120.00, image: 'images/j4.jpg', category: 'jordans', rating: 4.2, reviews: 42, tags: ['new', 'bestseller'] },
+                { id: 2, name: 'Air Max 90P', price: 79.99, originalPrice: 100.00, image: 'images/max.jpg', category: 'nike', rating: 4.1, reviews: 28, tags: ['featured'] },
+                { id: 3, name: 'Air Jordan 3', price: 94.99, originalPrice: 125.00, image: 'images/j11.jpg', category: 'jordans', rating: 4.7, reviews: 67, tags: ['limited'] },
+                { id: 4, name: 'Air Force 1 Best Quality', price: 69.99, originalPrice: 90.00, image: 'images/n2.jpg', category: 'nike', rating: 4.5, reviews: 156, tags: ['bestseller'] },
+                { id: 5, name: 'Air Force 1 White', price: 74.99, originalPrice: 95.00, image: 'images/bl.jpg', category: 'nike', rating: 4.3, reviews: 89, tags: ['popular'] },
+                { id: 6, name: 'Timberland Boots', price: 119.99, originalPrice: 150.00, image: 'images/timb.jpg', category: 'lifestyle', rating: 4.0, reviews: 34, tags: ['premium'] },
+                { id: 7, name: 'SB Dunk Red', price: 84.99, originalPrice: 110.00, image: 'images/se.jpg', category: 'nike', rating: 4.4, reviews: 78, tags: ['trending'] },
+                { id: 8, name: 'Air Force Plain White', price: 72.99, originalPrice: 92.00, image: 'images/n22.jpg', category: 'nike', rating: 4.2, reviews: 52, tags: ['classic'] }
+            ];
+
+            const categories = [
+                { id: 'all', name: 'All Products', icon: '🌟' },
+                { id: 'jordans', name: 'Jordan Shoes', icon: '🏀' },
+                { id: 'nike', name: 'Nike Shoes', icon: '✓' },
+                { id: 'lifestyle', name: 'Lifestyle', icon: '💼' }
+            ];
+
+            const categoryData = {
+                jordans: { title: 'Jordan Shoes Collection', description: 'Discover the legendary Air Jordan collection with premium quality and iconic designs.', image: 'images/jor.jpg' },
+                nike: { title: 'Nike Shoes Collection', description: 'Experience innovation and performance with our premium Nike footwear collection.', image: 'images/nike.jpg' },
+                lifestyle: { title: 'Lifestyle Collection', description: 'Comfortable and stylish footwear perfect for everyday wear and special occasions.', image: 'images/lv.jpg' }
+            };
+
+            const filteredProducts = activeCategory === 'all'
+                ? products
+                : products.filter(product => product.category === activeCategory);
+
+            const handleCategoryChange = (categoryId) => {
+                setActiveCategory(categoryId);
+            };
+
+            const handleAddToCart = (product) => {
+                addToCart(product);
+                showNotification(`${product.name} added to cart!`, 'success');
+            };
+
+            const handleAddToWishlist = (product) => {
+                const exists = wishlist.find(item => item.id === product.id);
+                if (!exists) {
+                    addToWishlist(product);
+                    showNotification(`${product.name} added to wishlist! ❤️`, 'success');
+                } else {
+                    showNotification(`${product.name} is already in your wishlist!`, 'info');
+                }
+            };
+
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            return React.createElement('div', { className: 'products-page' },
+                // Hero Section
+                React.createElement('section', { className: 'products-hero' },
+                    React.createElement('h1', null, 'Our Premium Collection'),
+                    React.createElement('p', null, 'Discover the latest trends in sneakers and footwear')
+                ),
+
+                // Category Section
+                React.createElement('section', { className: 'category-section' },
+                    React.createElement('h2', null, 'Shop By Category'),
+                    React.createElement('div', { className: 'category-filters' },
+                        categories.map(category =>
+                            React.createElement('button', {
+                                key: category.id,
+                                className: `filter-btn ${activeCategory === category.id ? 'active' : ''}`,
+                                onClick: () => handleCategoryChange(category.id)
+                            },
+                                React.createElement('span', { className: 'filter-icon' }, category.icon),
+                                category.name
+                            )
+                        )
+                    ),
+
+                    // Category Banner
+                    activeCategory !== 'all' && categoryData[activeCategory] &&
+                        React.createElement(CategoryBanner, { category: categoryData[activeCategory] })
+                ),
+
+                // Products Grid
+                React.createElement('section', { className: 'products-section' },
+                    React.createElement('div', { className: 'products-grid' },
+                        filteredProducts.map(product =>
+                            React.createElement(ProductCard, {
+                                key: product.id,
+                                product: product,
+                                onAddToCart: handleAddToCart,
+                                onAddToWishlist: handleAddToWishlist,
+                                isInWishlist: wishlist.some(item => item.id === product.id)
+                            })
+                        )
+                    )
+                ),
+
+                // Notification
+                notification && React.createElement(Notification, {
+                    message: notification.message,
+                    type: notification.type,
+                    onClose: () => setNotification(null)
+                })
+            );
+        }
+
+        // HomePage Component
+        function HomePage({ navigateTo }) {
+            return React.createElement('div', { className: 'home-page' },
+                React.createElement('section', { className: 'hero' },
+                    React.createElement('div', { className: 'hero-content' },
+                        React.createElement('h1', null,
+                            'Style Starts Here ',
+                            React.createElement('br'),
+                            React.createElement('span', null, 'Clothes and Fashion '),
+                            React.createElement('br'),
+                            'That Fits Your Lifestyle'
+                        ),
+                        React.createElement('p', null, 'Welcome to your ultimate destination for fashion and footwear! We bring you the latest trends in shoes and clothing. Whether you are looking for everyday comfort, bold street wear or classy outfits for special occasions, we have got you covered.'),
+                        React.createElement('button', {
+                            className: 'cta-button',
+                            onClick: () => navigateTo('products')
+                        }, 'PURCHASE')
+                    )
+                )
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [cart, setCart] = useState([]);
+            const [wishlist, setWishlist] = useState([]);
+
+            // Load cart and wishlist from localStorage on mount
+            useEffect(() => {
+                const savedCart = localStorage.getItem('skySmartCart');
+                const savedWishlist = localStorage.getItem('skySmartWishlist');
+
+                if (savedCart) {
+                    setCart(JSON.parse(savedCart));
+                }
+                if (savedWishlist) {
+                    setWishlist(JSON.parse(savedWishlist));
+                }
+            }, []);
+
+            // Save cart and wishlist to localStorage whenever they change
+            useEffect(() => {
+                localStorage.setItem('skySmartCart', JSON.stringify(cart));
+            }, [cart]);
+
+            useEffect(() => {
+                localStorage.setItem('skySmartWishlist', JSON.stringify(wishlist));
+            }, [wishlist]);
+
+            const navigateTo = (page) => {
+                setCurrentPage(page);
+                window.history.pushState(null, '', `#${page}`);
+            };
+
+            // Handle browser back/forward buttons
+            useEffect(() => {
+                const handlePopState = () => {
+                    const hash = window.location.hash.replace('#', '') || 'home';
+                    setCurrentPage(hash);
+                };
+
+                window.addEventListener('popstate', handlePopState);
+
+                // Set initial page based on URL hash
+                const initialHash = window.location.hash.replace('#', '') || 'home';
+                setCurrentPage(initialHash);
+
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+
+            const addToCart = (product) => {
+                setCart(prevCart => {
+                    const existingItem = prevCart.find(item => item.id === product.id);
+                    if (existingItem) {
+                        return prevCart.map(item =>
+                            item.id === product.id
+                                ? { ...item, quantity: item.quantity + 1 }
+                                : item
+                        );
+                    }
+                    return [...prevCart, { ...product, quantity: 1 }];
+                });
+            };
+
+            const addToWishlist = (product) => {
+                setWishlist(prevWishlist => {
+                    const exists = prevWishlist.find(item => item.id === product.id);
+                    if (!exists) {
+                        return [...prevWishlist, product];
+                    }
+                    return prevWishlist;
+                });
+            };
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'products':
+                        return React.createElement(ProductsPage, {
+                            cart: cart,
+                            wishlist: wishlist,
+                            addToCart: addToCart,
+                            addToWishlist: addToWishlist
+                        });
+                    case 'home':
+                    default:
+                        return React.createElement(HomePage, { navigateTo: navigateTo });
+                }
+            };
+
+            return React.createElement('div', { className: 'App' },
+                React.createElement(Header, {
+                    cart: cart,
+                    wishlist: wishlist,
+                    navigateTo: navigateTo,
+                    currentPage: currentPage
+                }),
+                React.createElement('main', null,
+                    renderPage()
+                )
+            );
+        }
+
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>

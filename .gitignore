@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets (copy .env.example to .env)
+.env
+.env.local
+.env.*.local
+
+# Build output (run `npm run build` after clone)
+dist/
+
+# Runtime uploads (chat media, etc.)
+uploads/
+
+# Logs and debug
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Optional local tooling
+.idea/
+.vscode/
