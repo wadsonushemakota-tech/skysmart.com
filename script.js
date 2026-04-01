@@ -68,8 +68,31 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addToCartButton) {
         addToCartButton.addEventListener('click', function(e) {
             e.preventDefault();
+            const productName = "Air Jordan 4 \"In Blue\""; // Fixed name for hero product
+            const price = 25.00;
             const size = document.querySelector('#size').value;
-            alert(`Added Air Jordan 4 "In Blue" size ${size} to cart!`);
+            
+            let cart = JSON.parse(localStorage.getItem('skySmartCart') || '[]');
+            const existingItem = cart.find(item => item.name === productName);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    name: productName,
+                    price: price,
+                    quantity: 1,
+                    size: size,
+                    addedAt: new Date().toISOString()
+                });
+            }
+
+            localStorage.setItem('skySmartCart', JSON.stringify(cart));
+            
+            // Dispatch custom event to update other pages or parts of UI
+            window.dispatchEvent(new Event('storage'));
+            
+            alert(`Added ${productName} size ${size} to cart!`);
         });
     }
 

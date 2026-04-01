@@ -58,49 +58,55 @@ function setupEventListeners() {
     });
 }
 
-// Initialize products (for static HTML)
+const staticProductsFallback = [
+    { id: 1, name: 'Jordan 4 Original', price: 25, category: 'jordans', images: ['images/j4.jpg'], colors: ['Blue', 'Red'], description: 'Classic Air Jordan 4' },
+    { id: 2, name: 'Air Force 1 White', price: 15, category: 'nike', images: ['images/bl.jpg'], colors: ['White', 'Black'], description: 'Iconic AF1' },
+    { id: 3, name: 'Air Jordan 11', price: 25, category: 'jordans', images: ['images/j11.jpg'], colors: ['Concord', 'Bred'], description: 'Elegant AJ11' },
+    { id: 4, name: 'Air Max 90P', price: 22, category: 'nike', images: ['images/max.jpg'], colors: ['Grey'], description: 'Performance Max 90' }
+];
+
+// Initialize products
 function initializeProducts() {
-    // Set "All Products" as active by default and hide category banner
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+
+    // Show loading state
+    productsGrid.innerHTML = '<div class="loading-products">Loading collection...</div>';
+
+    // Set "All Products" as active by default
     const allProductsBtn = document.querySelector('.filter-btn[onclick*="all"]');
-    if (allProductsBtn) {
-        allProductsBtn.classList.add('active');
-    }
+    if (allProductsBtn) allProductsBtn.classList.add('active');
 
-    // Hide category banner initially
-    const categoryBanner = document.getElementById('category-banner');
-    if (categoryBanner) {
-        categoryBanner.style.display = 'none';
-    }
-
-    // Initialize cart and wishlist counts
+    // Initialize counts and icons
     updateCartCount();
     updateWishlistCount();
-
-    // Initialize button states
-    setTimeout(initializeButtonsState, 100); // Small delay to ensure DOM is ready
-
-    // Add cart/wishlist icons if they don't exist
     addCartWishlistIcons();
 
-    // Check if there's a hash in the URL for direct linking
-    const hash = window.location.hash.replace('#', '');
-    if (hash && hash !== 'all') {
-        setTimeout(() => {
-            filterProducts(hash);
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('onclick').includes(hash)) {
-                    btn.classList.add('active');
-                }
-            });
-        }, 100);
-    }
+    // Fetch from API or use static fallback
+    skySmartFetch('/api/products')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success && data.products && data.products.length > 0) {
+                allProducts = data.products;
+                displayProducts(allProducts);
+            } else {
+                console.warn('API returned no products or success=false, using fallback');
+                allProducts = staticProductsFallback;
+                displayProducts(allProducts);
+            }
+            setupLegacyEvents();
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+            allProducts = staticProductsFallback;
+            displayProducts(allProducts);
+            setupLegacyEvents();
+        });
 
     console.log('Products page initialized');
-    console.log('Current cart:', productsCart);
-    console.log('Current wishlist:', productsWishlist);
 }
+
+// Removed duplicate loadProducts and DOMContentLoaded logic
 
 // Cart management functions
 function viewCart() {
@@ -329,7 +335,7 @@ let productsCart = JSON.parse(localStorage.getItem('skySmartCart') || '[]');
 let productsWishlist = JSON.parse(localStorage.getItem('skySmartWishlist') || '[]');
 
 // Add to cart functionality
-function addToCart(productName, price) {
+function addToCart(productName, price, button = null) {
     // Check if product already in cart
     const existingItem = productsCart.find(item => item.name === productName);
 
@@ -352,11 +358,7 @@ function addToCart(productName, price) {
     // Update cart count
     updateCartCount();
 
-    // Change button temporarily (if triggered by a button click)
-    let button = null;
-    try {
-        button = (typeof event !== 'undefined' && event && event.target) ? event.target.closest('.add-to-cart-btn') : null;
-    } catch (e) { button = null; }
+    // Change button temporarily
     if (button) {
         const originalHTML = button.innerHTML;
         button.innerHTML = '<span class="cart-icon">✓</span> Added!';
@@ -767,35 +769,8 @@ let currentCategory = 'all';
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
-    // setupEventListeners(); // Removed to avoid duplication with dynamically loaded products
     initializeProducts();
-    
-    // Check if we are on the products.html page
-    if (document.getElementById('productsGrid')) {
-        loadProducts(); // Load products from PostgreSQL
-    }
 });
-
-// Load products from PostgreSQL
-async function loadProducts() {
-    try {
-        showLoading();
-        const response = await skySmartFetch('/api/products');
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        
-        if (data.success) {
-            allProducts = data.products;
-            displayProducts(allProducts);
-            setupLegacyEvents();
-        } else {
-            showError('Failed to load products: ' + (data.error || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Error loading products:', error);
-        showError('Could not connect to the server. Please ensure the backend is running.');
-    }
-}
 
 // Display products in the grid
 function displayProducts(products) {
@@ -821,15 +796,15 @@ function displayProducts(products) {
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
-    card.dataset.category = product.category.toLowerCase().replace(/\s+/g, '-');
+    card.dataset.category = product.category ? product.category.toLowerCase().replace(/\s+/g, '-') : 'all';
     
     const image = getProductImage(product);
-    const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+    const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0);
     const originalPrice = (price * 1.25).toFixed(2); // Mock discount
     
     card.innerHTML = `
         <div class="product-image-container">
-            <img src="${image}" alt="${product.name}" data-product-id="${product.id}" class="main-product-image">
+            <img src="${image}" alt="${product.name}" data-product-id="${product.id}" class="main-product-image" onerror="this.src='https://via.placeholder.com/300x300?text=Sky+Smart+Shoe'">
             <div class="product-overlay">
                 <button class="quick-view-btn" data-product-id="${product.id}">Quick View</button>
             </div>
@@ -869,16 +844,16 @@ function createProductCard(product) {
             
             <div class="product-gallery-section" id="gallery-${product.id}" style="display: none;">
                 <div class="gallery-grid">
-                    ${product.images ? product.images.map(img => `
-                        <div class="gallery-item" data-product-id="${product.id}" data-image="${img}" data-color="${product.colors[product.images.indexOf(img)] || 'Default'}">
-                            <img src="${img}" alt="Colorway">
+                    ${product.images && product.images.length > 1 ? product.images.map(img => `
+                        <div class="gallery-item" data-product-id="${product.id}" data-image="${img}" data-color="${(product.colors && product.colors[product.images.indexOf(img)]) || 'Default'}">
+                            <img src="${img}" alt="Colorway" onerror="this.src='https://via.placeholder.com/100x100?text=No+Img'">
                         </div>
                     `).join('') : ''}
                 </div>
             </div>
             
             <div class="gallery-toggle">
-                <button class="view-gallery-btn" data-product-id="${product.id}">📷 View Gallery</button>
+                ${product.images && product.images.length > 1 ? `<button class="view-gallery-btn" data-product-id="${product.id}">📷 View Gallery</button>` : ''}
             </div>
 
             <div class="product-badges">
@@ -1042,7 +1017,7 @@ function addProductEventListeners() {
             const productId = parseInt(this.dataset.productId);
             const product = allProducts.find(p => p.id === productId);
             if (product) {
-                addToCart(product.name, product.price);
+                addToCart(product.name, product.price, this);
             }
         });
     });

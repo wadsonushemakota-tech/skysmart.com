@@ -372,20 +372,27 @@
 
             if (!text && !selectedImage) return;
 
+            // Immediately clear input for snappy feel
+            chatMessageInput.value = '';
+            const tempSelectedImage = selectedImage;
+            selectedImage = null;
+            if (chatImageInput) chatImageInput.value = '';
+            if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+
             localStorage.setItem('skySmartChatName', user);
 
             let mediaUrl = null;
             let mediaType = 'text';
 
-            if (selectedImage) {
+            if (tempSelectedImage) {
                 const formData = new FormData();
-                formData.append('file', selectedImage);
+                formData.append('file', tempSelectedImage);
                 try {
                     const uploadUrl =
-                    typeof window.skySmartApiUrl === 'function'
-                        ? window.skySmartApiUrl('/api/chat/upload')
-                        : '/api/chat/upload';
-                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+                        typeof window.skySmartApiUrl === 'function'
+                            ? window.skySmartApiUrl('/api/chat/upload')
+                            : '/api/chat/upload';
+                    const response = await fetch(uploadUrl, { method: 'POST', body: formData });
                     const data = await response.json();
                     if (data.success) {
                         mediaUrl = data.mediaUrl;
@@ -406,14 +413,10 @@
                 reply_to_text: currentReplyTo
                     ? currentReplyTo.text || '[' + currentReplyTo.media_type + ']'
                     : null,
+                timestamp: new Date().toISOString()
             };
 
             window.socket.emit('chat message', messageData);
-
-            chatMessageInput.value = '';
-            selectedImage = null;
-            if (chatImageInput) chatImageInput.value = '';
-            if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
             clearReply();
         };
 

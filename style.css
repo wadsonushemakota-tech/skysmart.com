@@ -1885,11 +1885,90 @@ ul li a:hover{
     }
 }
 
-    /* Product Section */
-    .products {
+    /* Full Screen Mobile & PWA Optimization */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure Founder visibility on all screens */
+.founder-modal-body {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.founder-modal-body img {
+    width: 250px;
+    height: 250px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .founder-modal-body {
+        flex-direction: column;
+        align-items: center;
         text-align: center;
-        padding: 60px 20px;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .founder-modal-body img {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 20px;
+    }
+    
+    .founder-modal-content {
+        width: 95vw;
+        max-height: 90vh;
+        margin: 5vh auto;
+    }
+}
+
+/* Mobile Full Screen Fixes */
+@media (max-width: 768px) {
+    .hero, .navbar, .community, .products, .footer {
+        width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        box-sizing: border-box;
+    }
+    
+    .founder-modal-content {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        overflow-y: auto;
+    }
+}
+
+section {
+    width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.container, .community-container, .footer-content {
+    width: 100% !important;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
         margin: 20px;
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);

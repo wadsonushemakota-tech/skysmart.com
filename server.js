@@ -148,9 +148,9 @@ const initDb = async () => {
         const res = await client.query('SELECT COUNT(*) FROM products');
         if (parseInt(res.rows[0].count) === 0) {
             const initialProducts = [
-                ["Jordan 4 Original", 25, [6,7,8,9,10,11,12], ['Blue', 'Red', 'Yellow', 'Black', 'White'], ['images/j4.jpg', 'images/2.jpg', 'images/3.jpg'], "Classic Air Jordan 4 in stunning colorways", "jordans"],
-                ["Air Force 1 White", 15, [6,7,8,9,10,11,12], ['White', 'Black', 'Red', 'Blue', 'Green'], ['images/bl.jpg', 'images/af1-black.jpg', 'images/af1-red.jpg'], "The iconic Air Force 1 in classic white leather", "nike"],
-                ["Air Jordan 11", 25, [6,7,8,9,10,11,12], ['Concord', 'Bred', 'Space Jam', 'Cool Grey', 'Win Like 96'], ['images/j11.jpg', 'images/j11-bred.jpg', 'images/j11-space.jpg'], "Elegant Air Jordan 11 with patent leather and carbon fiber", "jordans"],
+                ["Jordan 4 Original", 25, [6,7,8,9,10,11,12], ['Blue', 'Red', 'Yellow', 'Black', 'White'], ['images/j4.jpg'], "Classic Air Jordan 4 in stunning colorways", "jordans"],
+                ["Air Force 1 White", 15, [6,7,8,9,10,11,12], ['White', 'Black', 'Red', 'Blue', 'Green'], ['images/bl.jpg'], "The iconic Air Force 1 in classic white leather", "nike"],
+                ["Air Jordan 11", 25, [6,7,8,9,10,11,12], ['Concord', 'Bred', 'Space Jam', 'Cool Grey', 'Win Like 96'], ['images/j11.jpg'], "Elegant Air Jordan 11 with patent leather and carbon fiber", "jordans"],
                 ["Air Max 90P", 22, [6,7,8,9,10,11,12], ['Grey', 'Black', 'Volt'], ['images/max.jpg'], "Performance and lifestyle Air Max 90", "nike"],
                 ["Timberland Boots", 30, [6,7,8,9,10,11,12], ['Wheat', 'Black'], ['images/timb.jpg'], "Durable and stylish Timberland boots", "lifestyle"],
                 ["SB Dunk Red", 15, [6,7,8,9,10,11,12], ['Red', 'Blue'], ['images/se.jpg'], "Classic SB Dunk low profile", "sneakers"],
