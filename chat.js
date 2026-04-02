@@ -403,6 +403,8 @@
             if (tempSelectedImage) {
                 const formData = new FormData();
                 formData.append('file', tempSelectedImage);
+                // Log for debugging
+                console.log('Uploading image...', tempSelectedImage.name);
                 try {
                     const uploadUrl =
                         typeof window.skySmartApiUrl === 'function'
@@ -413,9 +415,12 @@
                     if (data.success) {
                         mediaUrl = data.mediaUrl;
                         mediaType = 'image';
+                        console.log('Image uploaded successfully:', mediaUrl);
+                    } else {
+                        console.error('Image upload failed:', data.message);
                     }
                 } catch (err) {
-                    console.error('Upload failed:', err);
+                    console.error('Upload error:', err);
                 }
             }
 
@@ -438,6 +443,7 @@
                 addMessageToUI({...messageData, id: 'temp-' + tempId});
             }
 
+            // Emit the message
             window.socket.emit('chat message', messageData);
             clearReply();
         };

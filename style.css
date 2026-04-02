@@ -1659,17 +1659,14 @@ ul li a:hover{
     pointer-events: none;
 }
 
-/* Ensure the chat tools are always visible (fallback glyphs) */
-.wa-tool-emoji ion-icon,
-.wa-tool-sticker ion-icon,
-.wa-tool-mic ion-icon {
-    display: none;
+/* Ensure the chat tools are always visible (prefer icons) */
+.wa-tool-btn ion-icon {
+    display: block;
+    pointer-events: none;
 }
 
-.wa-tool-emoji .wa-tool-fallback,
-.wa-tool-sticker .wa-tool-fallback,
-.wa-tool-mic .wa-tool-fallback {
-    display: block;
+.wa-tool-fallback {
+    display: none;
 }
 
 .wa-tool-photo { color: #128c7e; }
@@ -1687,9 +1684,12 @@ ul li a:hover{
     border: none;
     background: transparent;
     padding: 8px 4px;
-    font-size: 15px;
+    font-size: 16px; /* 16px prevents iOS zoom */
     color: #111b21;
     line-height: 1.4;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .wa-message-input:focus {
