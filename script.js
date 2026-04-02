@@ -63,6 +63,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Mobile Hamburger Menu
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    const navMenu = document.getElementById('nav-menu');
+    const mobileClose = document.getElementById('mobile-close');
+
+    if (hamburgerMenu && navMenu) {
+        hamburgerMenu.addEventListener('click', () => {
+            navMenu.classList.add('active');
+        });
+    }
+
+    if (mobileClose && navMenu) {
+        mobileClose.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        });
+    }
+
+    // Close mobile menu on link click
+    const navLinks = document.querySelectorAll('.menu ul li a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navMenu) {
+                navMenu.classList.remove('active');
+            }
+        });
+    });
+
     // Add to cart functionality
     const addToCartButton = document.querySelector('.btn-primary');
     if (addToCartButton) {

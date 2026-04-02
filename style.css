@@ -1972,29 +1972,135 @@ html, body {
     }
 }
 
-/* Mobile Navigation and Hero Fixes */
+.hamburger-menu {
+    display: none;
+    font-size: 35px;
+    color: white;
+    cursor: pointer;
+}
+
+.mobile-close {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 35px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Updated Mobile Navigation and Layout Fixes */
 @media (max-width: 768px) {
     .navbar {
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 10px 15px !important;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
+        height: auto;
+        padding: 15px;
+        flex-wrap: wrap;
         background: rgba(0,0,0,0.9);
+        border-radius: 0;
+        margin-top: 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
-    .hero {
-        padding-top: 80px;
+    .hamburger-menu {
+        display: block;
+        order: 1;
+    }
+
+    .logo {
+        font-size: 30px;
+        order: 2;
+    }
+
+    .menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 250px;
+        height: 100vh;
+        background: rgba(0,0,0,0.95);
+        flex-direction: column;
+        justify-content: center;
+        transition: 0.4s ease;
+        z-index: 1001;
+        backdrop-filter: blur(10px);
+    }
+
+    .menu.active {
+        right: 0;
+    }
+
+    .menu ul {
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        padding: 40px 0;
+    }
+
+    .menu ul li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .menu ul li a {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+    }
+
+    .mobile-close {
+        display: block;
+    }
+
+    .search {
+        display: none; /* Hide search on mobile for cleaner look */
+    }
+
+    .cart-icon, .wishlist-icon {
+        order: 3;
+    }
+
+    /* Content Fixes - Remove overlapping */
+    .content {
+        flex-direction: column;
         height: auto;
-        min-height: 100vh;
+        min-height: auto;
+        padding: 100px 20px 50px;
+        text-align: center;
+        gap: 40px;
     }
 
     .hero-content {
-        width: 95%;
-        padding: 20px;
+        width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-content .par {
+        font-size: 16px;
+    }
+
+    .form {
+        width: 100%;
+        max-width: 450px;
+        max-height: none;
+        margin: 0 auto;
+        padding: 25px;
+        overflow-y: visible;
+    }
+
+    .founder-photo {
+        max-width: 250px;
+    }
+
+    .main {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
     }
 }
 
