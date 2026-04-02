@@ -19,9 +19,11 @@ body {
     background: linear-gradient(to top, rgba(0,0,0,0.7)50%,rgba(0, 0, 0, 0.5)50%), url(images/1.jpg);
     background-position: center;
     background-size: cover;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     position: relative;
-    overflow: hidden;
+    overflow-y: visible;
+    padding-bottom: 50px;
 }
 
 .navbar{
@@ -1854,34 +1856,40 @@ ul li a:hover{
 
 @media (max-width: 640px) {
     .wa-chat-room.chat-room {
-        min-height: 480px;
-        height: min(70vh, 560px);
-        border-radius: 12px;
+        min-height: 500px;
+        height: 80vh;
+        border-radius: 0;
+        margin: 0;
+        width: 100%;
     }
 
-    .reply-btn {
-        opacity: 1;
-        position: static;
-        margin-top: 6px;
-        align-self: flex-end;
-    }
-
-    .message.sent .reply-btn {
-        left: auto;
-        right: auto;
-    }
-
-    .wa-msg-inner {
-        padding-right: 36px;
-    }
-
-    .message.wa-msg {
-        max-width: 92%;
+    .wa-composer {
+        padding: 8px;
+        gap: 8px;
     }
 
     .wa-composer-tools {
-        flex-wrap: wrap;
-        max-width: 100px;
+        display: flex;
+        gap: 5px;
+        max-width: none;
+    }
+
+    .wa-tool-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+
+    .wa-message-input {
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+
+    .wa-chat-messages {
+        padding: 10px;
+    }
+
+    .message.wa-msg {
+        max-width: 85%;
     }
 }
 
@@ -1898,11 +1906,39 @@ html, body {
 }
 
 /* Ensure Founder visibility on all screens */
+.founder-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.founder-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .founder-modal-body {
     display: flex;
     flex-direction: row;
     gap: 30px;
     align-items: flex-start;
+    padding: 30px;
+    overflow-y: auto;
 }
 
 .founder-modal-body img {
@@ -1919,6 +1955,7 @@ html, body {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        padding: 20px;
     }
     
     .founder-modal-body img {
@@ -1928,29 +1965,36 @@ html, body {
     }
     
     .founder-modal-content {
-        width: 95vw;
-        max-height: 90vh;
-        margin: 5vh auto;
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
     }
 }
 
-/* Mobile Full Screen Fixes */
+/* Mobile Navigation and Hero Fixes */
 @media (max-width: 768px) {
-    .hero, .navbar, .community, .products, .footer {
-        width: 100vw !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-        box-sizing: border-box;
+    .navbar {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px 15px !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        background: rgba(0,0,0,0.9);
     }
-    
-    .founder-modal-content {
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        overflow-y: auto;
+
+    .hero {
+        padding-top: 80px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero-content {
+        width: 95%;
+        padding: 20px;
     }
 }
 

@@ -82,10 +82,26 @@
         `;
     }
 
-    function addMessageToUI(msg) {
+ function addMessageToUI(msg) {
         if (!chatMessages) return;
+        
+        // Don't add duplicate if it's a real message from server that matches a temp one
+        if (msg.id && !String(msg.id).startsWith('temp-')) {
+            // Check for temp message with same text and user from last 5 seconds
+            const now = Date.now();
+            const tempMsgs = document.querySelectorAll('[id^="msg-temp-"]');
+            tempMsgs.forEach(temp => {
+                const tempTime = parseInt(temp.id.replace('msg-temp-', ''));
+                if (now - tempTime < 10000) { // 10 second window
+                    const tempText = temp.querySelector('.message-text')?.textContent;
+                    if (tempText === msg.text) {
+                        temp.remove();
+                    }
+                }
+            });
+        }
 
-        const welcome = chatMessages.querySelector('.chat-welcome');
+        const welcome = document.querySelector('.chat-welcome');
         if (welcome) welcome.remove();
 
         const currentUserName = (chatUserName ? chatUserName.value.trim() : '') || 'Anonymous';
@@ -93,7 +109,7 @@
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `message wa-msg ${isSent ? 'sent' : 'received'}`;
-        if (msg.id != null) messageDiv.id = 'msg-' + msg.id;
+        if (msg.id) messageDiv.id = 'msg-' + msg.id;
 
         const ts = msg.timestamp ? new Date(msg.timestamp) : new Date();
         const timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -415,6 +431,12 @@
                     : null,
                 timestamp: new Date().toISOString()
             };
+
+            // Optimization for mobile: local echo
+            const tempId = Date.now();
+            if (typeof addMessageToUI === 'function') {
+                addMessageToUI({...messageData, id: 'temp-' + tempId});
+            }
 
             window.socket.emit('chat message', messageData);
             clearReply();
