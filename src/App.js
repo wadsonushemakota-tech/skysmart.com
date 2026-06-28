@@ -191,7 +191,15 @@ function App() {
         );
       case 'home':
       default:
-        return <HomePage navigateTo={navigateTo} />;
+        return (
+          <HomePage
+            navigateTo={navigateTo}
+            cart={cart}
+            wishlist={wishlist}
+            addToCart={addToCart}
+            addToWishlist={addToWishlist}
+          />
+        );
     }
   };
 
