@@ -299,7 +299,7 @@ app.use('/uploads', express.static('uploads'));
 if (!API_ONLY) {
     app.use(express.static('.'));
     app.use('/dist', express.static(path.join(__dirname, 'dist')));
-    app.get('/store', (req, res) => {
+    app.get(['/', '/store'], (req, res) => {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 }
