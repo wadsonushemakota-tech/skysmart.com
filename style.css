@@ -2725,12 +2725,13 @@ footer {
 /* Featured Products Section */
 .featured-products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin: 40px 0;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 40px auto;
+    max-width: 1600px;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .featured-product {
@@ -2741,6 +2742,8 @@ footer {
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     border: 1px solid #f0f0f0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .featured-product:hover {
@@ -2749,8 +2752,10 @@ footer {
 }
 
 .featured-product img {
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    aspect-ratio: 1/1;
     object-fit: cover;
     border-radius: 10px;
     margin-bottom: 15px;
@@ -2774,7 +2779,45 @@ footer {
     font-size: 1.2rem;
     font-weight: 700;
     color: #ff6b35;
-    margin: 0;
+    margin: 0 0 15px 0;
+}
+
+.product-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.quick-view-btn, .add-to-cart-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 120px;
+}
+
+.quick-view-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.quick-view-btn:hover {
+    background: #5a6268;
+}
+
+.add-to-cart-btn {
+    background: linear-gradient(45deg, #ff6b35, #ff8c42);
+    color: white;
+}
+
+.add-to-cart-btn:hover {
+    background: linear-gradient(45deg, #ff8c42, #ff6b35);
+    transform: scale(1.02);
 }
 
 section.about ul {

@@ -377,76 +377,105 @@
         }
 
         const sendMessage = async () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                resetVoiceUI();
-                return;
-            }
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            resetVoiceUI();
+            return;
+        }
 
-            const text = chatMessageInput.value.trim();
-            const user = (chatUserName ? chatUserName.value.trim() : '') || 'Anonymous';
+        const text = chatMessageInput.value.trim();
+        const user = (chatUserName ? chatUserName.value.trim() : '') || 'Anonymous';
 
-            if (!text && !selectedImage) return;
+        if (!text && !selectedImage) return;
 
-            // Immediately clear input for snappy feel
-            chatMessageInput.value = '';
-            const tempSelectedImage = selectedImage;
-            selectedImage = null;
-            if (chatImageInput) chatImageInput.value = '';
-            if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+        // Immediately clear input for snappy feel
+        chatMessageInput.value = '';
+        const tempSelectedImage = selectedImage;
+        selectedImage = null;
+        if (chatImageInput) chatImageInput.value = '';
+        if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
 
-            localStorage.setItem('skySmartChatName', user);
+        localStorage.setItem('skySmartChatName', user);
 
-            let mediaUrl = null;
-            let mediaType = 'text';
+        let mediaUrl = null;
+        let mediaType = 'text';
+        let localImageUrl = null;
 
-            if (tempSelectedImage) {
-                const formData = new FormData();
-                formData.append('file', tempSelectedImage);
-                // Log for debugging
-                console.log('Uploading image...', tempSelectedImage.name);
-                try {
-                    const uploadUrl =
-                        typeof window.skySmartApiUrl === 'function'
-                            ? window.skySmartApiUrl('/api/chat/upload')
-                            : '/api/chat/upload';
-                    const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+        // Create local preview URL first for instant display
+        if (tempSelectedImage) {
+            localImageUrl = URL.createObjectURL(tempSelectedImage);
+            mediaType = 'image';
+        }
+
+        // Optimization for mobile: local echo immediately with local image
+        const tempId = Date.now();
+        const localMessageData = {
+            user,
+            text: text || null,
+            media: localImageUrl,
+            media_type: mediaType,
+            reply_to_id: currentReplyTo ? currentReplyTo.id : null,
+            reply_to_user: currentReplyTo ? currentReplyTo.user : null,
+            reply_to_text: currentReplyTo
+                ? currentReplyTo.text || '[' + currentReplyTo.media_type + ']'
+                : null,
+            timestamp: new Date().toISOString(),
+            id: 'temp-' + tempId
+        };
+        if (typeof addMessageToUI === 'function') {
+            addMessageToUI(localMessageData);
+        }
+
+        if (tempSelectedImage) {
+            const formData = new FormData();
+            formData.append('file', tempSelectedImage);
+            // Log for debugging
+            console.log('Uploading image...', tempSelectedImage.name);
+            try {
+                const uploadUrl =
+                    typeof window.skySmartApiUrl === 'function'
+                        ? window.skySmartApiUrl('/api/chat/upload')
+                        : '/api/chat/upload';
+                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+                
+                // Check if response is OK before parsing JSON
+                if (!response.ok) {
+                    console.error('Upload failed with status:', response.status);
+                    // Keep using local image if upload fails
+                } else {
                     const data = await response.json();
                     if (data.success) {
                         mediaUrl = data.mediaUrl;
-                        mediaType = 'image';
                         console.log('Image uploaded successfully:', mediaUrl);
+                        // Update the message with real URL (optional)
                     } else {
                         console.error('Image upload failed:', data.message);
                     }
-                } catch (err) {
-                    console.error('Upload error:', err);
                 }
+            } catch (err) {
+                console.error('Upload error:', err);
+                // If upload fails, just keep the local image URL
+                mediaUrl = localImageUrl;
             }
+        }
 
-            const messageData = {
-                user,
-                text: text || null,
-                media: mediaUrl,
-                media_type: mediaType,
-                reply_to_id: currentReplyTo ? currentReplyTo.id : null,
-                reply_to_user: currentReplyTo ? currentReplyTo.user : null,
-                reply_to_text: currentReplyTo
-                    ? currentReplyTo.text || '[' + currentReplyTo.media_type + ']'
-                    : null,
-                timestamp: new Date().toISOString()
-            };
-
-            // Optimization for mobile: local echo
-            const tempId = Date.now();
-            if (typeof addMessageToUI === 'function') {
-                addMessageToUI({...messageData, id: 'temp-' + tempId});
-            }
-
-            // Emit the message
-            window.socket.emit('chat message', messageData);
-            clearReply();
+        const messageData = {
+            user,
+            text: text || null,
+            media: mediaUrl || localImageUrl,
+            media_type: mediaType,
+            reply_to_id: currentReplyTo ? currentReplyTo.id : null,
+            reply_to_user: currentReplyTo ? currentReplyTo.user : null,
+            reply_to_text: currentReplyTo
+                ? currentReplyTo.text || '[' + currentReplyTo.media_type + ']'
+                : null,
+            timestamp: new Date().toISOString()
         };
+
+        // Emit the message even if upload failed (with local URL)
+        window.socket.emit('chat message', messageData);
+        clearReply();
+    };
 
         chatSendBtn.addEventListener('click', sendMessage);
         chatMessageInput.addEventListener('keydown', (e) => {
