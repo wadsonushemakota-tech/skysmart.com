@@ -59,10 +59,16 @@ function setupEventListeners() {
 }
 
 const staticProductsFallback = [
-    { id: 1, name: 'Jordan 4 Original', price: 25, category: 'jordans', images: ['images/j4.jpg'], colors: ['Blue', 'Red'], description: 'Classic Air Jordan 4' },
-    { id: 2, name: 'Air Force 1 White', price: 15, category: 'nike', images: ['images/bl.jpg'], colors: ['White', 'Black'], description: 'Iconic AF1' },
-    { id: 3, name: 'Air Jordan 11', price: 25, category: 'jordans', images: ['images/j11.jpg'], colors: ['Concord', 'Bred'], description: 'Elegant AJ11' },
-    { id: 4, name: 'Air Max 90P', price: 22, category: 'nike', images: ['images/max.jpg'], colors: ['Grey'], description: 'Performance Max 90' }
+    { id: 1, name: 'Air Jordan 4', price: 20, category: 'jordans', images: ['images/j4.jpg'], colors: ['Blue', 'Red'], description: 'Classic Air Jordan 4' },
+    { id: 2, name: 'Air Force 1 Plain White', price: 18, category: 'nike', images: ['images/24.jpg'], colors: ['White', 'Black'], description: 'Iconic AF1' },
+    { id: 3, name: 'Jordan 1', price: 15, category: 'jordans', images: ['images/3.jpg'], colors: ['Concord', 'Bred'], description: 'Elegant AJ1' },
+    { id: 4, name: 'Jordan 3', price: 18, category: 'jordans', images: ['images/jord.jpg'], colors: ['Grey'], description: 'Performance Max 90' },
+    { id: 5, name: 'Jordan Black & Red', price: 18, category: 'jordans', images: ['images/rb.jpg'], colors: ['Black', 'Red'], description: 'Classic Bred Jordan' },
+    { id: 6, name: 'Jordan 4 Pinky', price: 20, category: 'jordans', images: ['images/jor.jpg'], colors: ['Pink'], description: 'Pinky Jordan 4' },
+    { id: 7, name: 'Nike SB Dunk Red', price: 18, category: 'nike', images: ['images/se.jpg'], colors: ['Red'], description: 'SB Dunk Red' },
+    { id: 8, name: 'Reebok', price: 25, category: 'sneakers', images: ['images/yez.jpeg'], colors: ['White'], description: 'Reebok Shoes' },
+    { id: 9, name: 'FILA', price: 18, category: 'sneakers', images: ['images/21.jpg'], colors: ['White'], description: 'FILA Sneakers' },
+    { id: 10, name: 'Adidas', price: 18, category: 'adidas', images: ['images/ad.jpg'], colors: ['Black'], description: 'Adidas Shoes' }
 ];
 
 // Initialize products
