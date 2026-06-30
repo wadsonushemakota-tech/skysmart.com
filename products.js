@@ -88,33 +88,11 @@ function initializeProducts() {
     updateWishlistCount();
     addCartWishlistIcons();
 
-    // Fetch from API or use static fallback
-    skySmartFetch('/api/products')
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('API request failed');
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (data && data.success && data.products && data.products.length > 0) {
-                allProducts = data.products;
-                displayProducts(allProducts);
-            } else {
-                console.warn('API returned no products or success=false, using fallback');
-                allProducts = staticProductsFallback;
-                displayProducts(allProducts);
-            }
-            setupLegacyEvents();
-        })
-        .catch(err => {
-            console.error('Fetch error:', err);
-            allProducts = staticProductsFallback;
-            displayProducts(allProducts);
-            setupLegacyEvents();
-        });
-
-    console.log('Products page initialized');
+    // Always use static products (no API dependency)
+    allProducts = staticProductsFallback;
+    displayProducts(allProducts);
+    setupLegacyEvents();
+    console.log('Products page initialized with static products');
 }
 
 // Removed duplicate loadProducts and DOMContentLoaded logic
