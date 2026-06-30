@@ -294,14 +294,34 @@ if (configuredCorsOrigin) {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
 
 if (!API_ONLY) {
-    app.use('/dist', express.static(path.join(__dirname, 'dist')));
-    app.get(['/', '/store'], (req, res) => {
+    // Serve all static assets first
+    app.use(express.static('.'));
+    
+    // Serve React app for any non-asset, non-API routes
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+        // Check if it's an existing file (css, js, images, etc.)
+        if (req.path.startsWith('/dist') || 
+            req.path.startsWith('/uploads') || 
+            req.path.startsWith('/images') || 
+            req.path.startsWith('/api-config.js') || 
+            req.path.startsWith('/api-base.js') ||
+            req.path.endsWith('.css') || 
+            req.path.endsWith('.js') || 
+            req.path.endsWith('.png') || 
+            req.path.endsWith('.jpg') || 
+            req.path.endsWith('.jpeg') || 
+            req.path.endsWith('.ico') || 
+            req.path.endsWith('.json')) {
+            return next();
+        }
+        // Otherwise send React app
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
-    app.use(express.static('.'));
 }
 
 // Authentication middleware
