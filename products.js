@@ -90,7 +90,12 @@ function initializeProducts() {
 
     // Fetch from API or use static fallback
     skySmartFetch('/api/products')
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('API request failed');
+            }
+            return res.json();
+        })
         .then(data => {
             if (data && data.success && data.products && data.products.length > 0) {
                 allProducts = data.products;
