@@ -299,27 +299,8 @@ if (!API_ONLY) {
     // Serve all static assets first
     app.use(express.static('.'));
     
-    // Serve React app for any non-asset, non-API routes
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api')) {
-            return next();
-        }
-        // Check if it's an existing file (css, js, images, etc.)
-        if (req.path.startsWith('/dist') || 
-            req.path.startsWith('/uploads') || 
-            req.path.startsWith('/images') || 
-            req.path.startsWith('/api-config.js') || 
-            req.path.startsWith('/api-base.js') ||
-            req.path.endsWith('.css') || 
-            req.path.endsWith('.js') || 
-            req.path.endsWith('.png') || 
-            req.path.endsWith('.jpg') || 
-            req.path.endsWith('.jpeg') || 
-            req.path.endsWith('.ico') || 
-            req.path.endsWith('.json')) {
-            return next();
-        }
-        // Otherwise send React app
+    // Serve React app only at /store and sub-routes
+    app.get('/store*', (req, res) => {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 }
