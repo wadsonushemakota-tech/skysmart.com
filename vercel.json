@@ -3,8 +3,5 @@
   "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/", "destination": "/dist/index.html" },
-    { "source": "/store", "destination": "/dist/index.html" }
-  ]
+  "rewrites": [{ "source": "/store", "destination": "/dist/index.html" }]
 }
