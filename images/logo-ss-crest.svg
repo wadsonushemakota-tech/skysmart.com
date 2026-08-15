@@ -1,136 +1,134 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1300" width="1000" height="1300" preserveAspectRatio="xMidYMid meet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1600" width="1400" height="1600" preserveAspectRatio="xMidYMid meet">
   <defs>
-    <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffe08a;stop-opacity:1" />
-      <stop offset="30%" style="stop-color:#f5d061;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#d4a84b;stop-opacity:1" />
-      <stop offset="70%" style="stop-color:#b8860b;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f5d061;stop-opacity:1" />
+    <linearGradient id="goldG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff4c4;stop-opacity:1"/>
+      <stop offset="28%" style="stop-color:#f5d061;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#d4a84b;stop-opacity:1"/>
+      <stop offset="72%" style="stop-color:#b8860b;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#f5d061;stop-opacity:1"/>
     </linearGradient>
-    <linearGradient id="goldEdge2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#fff2b3;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#d4a84b;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8b6914;stop-opacity:1" />
+    <linearGradient id="goldB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff4c4;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#d4a84b;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#8b6914;stop-opacity:1"/>
     </linearGradient>
-    <linearGradient id="blueShield2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a1f4e;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#1a3d7c;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0d2c63;stop-opacity:1" />
+    <linearGradient id="blueF" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1f4e;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#1a3d7c;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0d2c63;stop-opacity:1"/>
     </linearGradient>
-    <filter id="goldShine2" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="0.7" result="blur"/>
-      <feSpecularLighting in="blur" surfaceScale="4" specularConstant="1.5" specularExponent="20" lighting-color="#ffffff" result="specOut">
+    <filter id="gs" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.8" result="b"/>
+      <feSpecularLighting in="b" surfaceScale="4" specularConstant="1.8" specularExponent="22" lighting-color="#ffffff" result="s">
         <feDistantLight azimuth="45" elevation="60"/>
       </feSpecularLighting>
-      <feComposite in="specOut" in2="SourceGraphic" operator="in" result="specOut2"/>
-      <feComposite in="SourceGraphic" in2="specOut2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+      <feComposite in="s" in2="SourceGraphic" operator="in" result="s2"/>
+      <feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
     </filter>
   </defs>
 
-  <rect width="1000" height="1300" fill="#ffffff"/>
+  <!-- Solid white background (matches user image transparent->white display) -->
+  <rect width="1400" height="1600" fill="#ffffff"/>
 
-  <!-- LEFT SUN RAYS -->
-  <g fill="url(#goldGrad2)" filter="url(#goldShine2)">
-    <path d="M 140,300 L 260,265 L 255,345 Z"/>
-    <path d="M 125,415 L 245,380 L 240,458 Z"/>
-    <path d="M 125,530 L 245,495 L 240,573 Z"/>
-    <path d="M 140,645 L 260,610 L 255,690 Z"/>
-    <path d="M 170,755 L 285,720 L 280,795 Z"/>
-    <path d="M 215,855 L 320,822 L 315,893 Z"/>
-    <path d="M 270,945 L 365,912 L 360,978 Z"/>
+  <!-- ============ 14 RAYS (7 LEFT, 7 RIGHT) ============ -->
+  <!-- Left rays (top to bottom) -->
+  <g fill="url(#goldG)" filter="url(#gs)">
+    <path d="M 200,350 L 370,290 L 362,405 Z"/>
+    <path d="M 175,500 L 340,440 L 332,550 Z"/>
+    <path d="M 175,650 L 340,590 L 332,700 Z"/>
+    <path d="M 200,800 L 370,740 L 362,855 Z"/>
+    <path d="M 245,940 L 395,885 L 388,992 Z"/>
+    <path d="M 310,1070 L 448,1020 L 442,1120 Z"/>
+    <path d="M 395,1180 L 515,1140 L 510,1230 Z"/>
+  </g>
+  <!-- Right rays (top to bottom) -->
+  <g fill="url(#goldG)" filter="url(#gs)">
+    <path d="M 1200,350 L 1030,290 L 1038,405 Z"/>
+    <path d="M 1225,500 L 1060,440 L 1068,550 Z"/>
+    <path d="M 1225,650 L 1060,590 L 1068,700 Z"/>
+    <path d="M 1200,800 L 1030,740 L 1038,855 Z"/>
+    <path d="M 1155,940 L 1005,885 L 1012,992 Z"/>
+    <path d="M 1090,1070 L 952,1020 L 958,1120 Z"/>
+    <path d="M 1005,1180 L 885,1140 L 890,1230 Z"/>
   </g>
 
-  <!-- RIGHT SUN RAYS -->
-  <g fill="url(#goldGrad2)" filter="url(#goldShine2)">
-    <path d="M 860,300 L 740,265 L 745,345 Z"/>
-    <path d="M 875,415 L 755,380 L 760,458 Z"/>
-    <path d="M 875,530 L 755,495 L 760,573 Z"/>
-    <path d="M 860,645 L 740,610 L 745,690 Z"/>
-    <path d="M 830,755 L 715,720 L 720,795 Z"/>
-    <path d="M 785,855 L 680,822 L 685,893 Z"/>
-    <path d="M 730,945 L 635,912 L 640,978 Z"/>
+  <!-- ============ SHIELD OUTER GOLD BORDER ============ -->
+  <!-- Rectangular top with two notch tabs -->
+  <g filter="url(#gs)">
+    <path d="M 380,110
+             L 380,80 L 405,80 L 405,45
+             L 480,45 L 480,80
+             L 660,80 L 660,20 L 740,20 L 740,80
+             L 920,80 L 920,45 L 995,45 L 995,80 L 1020,80 L 1020,110
+             L 1020,720
+             Q 1020,1040 790,1280
+             L 700,1380
+             L 610,1280
+             Q 380,1040 380,720
+             Z"
+          fill="url(#goldB)" stroke="#8b6914" stroke-width="3"/>
   </g>
 
-  <!-- SHIELD OUTER GOLD BORDER (fills upper 80% of canvas) -->
-  <g filter="url(#goldShine2)">
-    <path d="M 280,70 
-             L 280,45 L 300,45 L 300,15 
-             L 360,15 L 360,45 L 500,45 L 500,0 L 500,0 L 500,45 L 640,45 L 640,15 L 700,15 L 700,45 L 720,45 L 720,70 
-             L 720,520 
-             Q 720,740 575,895 
-             L 500,975
-             L 425,895
-             Q 280,740 280,520 Z" 
-          fill="url(#goldEdge2)" stroke="#8b6914" stroke-width="2.5"/>
-  </g>
+  <!-- ============ SHIELD INNER BLUE FIELD ============ -->
+  <path d="M 425,120
+           L 975,120
+           L 975,720
+           Q 975,1000 785,1205
+           L 700,1300
+           L 615,1205
+           Q 425,1000 425,720
+           Z"
+        fill="url(#blueF)" stroke="#0a1f4e" stroke-width="2"/>
 
-  <!-- SHIELD INNER BLUE -->
-  <path d="M 315,80 
-           L 685,80 
-           L 685,520 
-           Q 685,725 560,865 
-           L 500,930
-           L 440,865
-           Q 315,725 315,520 Z" 
-        fill="url(#blueShield2)" stroke="#0a1f4e" stroke-width="1.5"/>
+  <!-- Inner thin gold rectangle (top-left and top-right partial lines, like the image) -->
+  <path d="M 475,165 L 925,165" fill="none" stroke="url(#goldG)" stroke-width="5" stroke-linecap="butt"/>
+  <path d="M 475,165 L 475,265" fill="none" stroke="url(#goldG)" stroke-width="5" stroke-linecap="butt"/>
+  <path d="M 925,165 L 925,265" fill="none" stroke="url(#goldG)" stroke-width="5" stroke-linecap="butt"/>
 
-  <!-- THIN GOLD INNER FRAME -->
-  <path d="M 345,110 L 655,110 L 655,175 M 345,110 L 345,175" 
-        fill="none" stroke="url(#goldGrad2)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Bottom thin gold V chevron -->
+  <path d="M 475,820 L 700,1100 L 925,820" fill="none" stroke="url(#goldG)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#gs)"/>
 
-  <!-- GOLD V CHEVRON AT BOTTOM -->
-  <path d="M 345,660 L 500,860 L 655,660" 
-        fill="none" stroke="url(#goldGrad2)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldShine2)"/>
-
-  <!-- SS MONOGRAM - LARGE, centered in shield -->
-  <g transform="translate(500,460) scale(3.1)" fill="url(#goldGrad2)" filter="url(#goldShine2)">
-    <path d="M -90,-80 
-             C -90,-130 -50,-150 0,-150 
-             C 50,-150 90,-130 90,-80 
-             C 90,-40 50,-20 0,-20 
-             C -50,-20 -90,-40 -90,0 
-             C -90,50 -50,80 0,80 
-             C 50,80 90,50 90,0 
-             C 90,-30 70,-45 45,-55 
-             C 70,-65 90,-85 90,-110 
-             C 90,-145 50,-170 0,-170 
-             C -50,-170 -90,-145 -90,-110 
-             C -90,-80 -60,-65 -35,-55 
+  <!-- ============ SS MONOGRAM — CRITICAL: WHITE on blue (NOT gold!) ============ -->
+  <g transform="translate(700,630) scale(4.6)" fill="#ffffff">
+    <path d="M -90,-80
+             C -90,-130 -50,-150 0,-150
+             C 50,-150 90,-130 90,-80
+             C 90,-40 50,-20 0,-20
+             C -50,-20 -90,-40 -90,0
+             C -90,50 -50,80 0,80
+             C 50,80 90,50 90,0
+             C 90,-30 70,-45 45,-55
+             C 70,-65 90,-85 90,-110
+             C 90,-145 50,-170 0,-170
+             C -50,-170 -90,-145 -90,-110
+             C -90,-80 -60,-65 -35,-55
              C -60,-45 -90,-30 -90,0 Z
-             M -35,45 
-             C -55,35 -65,20 -65,0 
-             C -65,-25 -40,-40 -15,-45 
-             C 10,-50 40,-40 50,-20 
-             C 55,-10 50,5 35,10 
-             C 20,15 0,20 -20,35 
+             M -35,45
+             C -55,35 -65,20 -65,0
+             C -65,-25 -40,-40 -15,-45
+             C 10,-50 40,-40 50,-20
+             C 55,-10 50,5 35,10
+             C 20,15 0,20 -20,35
              C -30,45 -35,45 -35,45 Z
-             M 35,55 
-             C 55,45 65,25 65,0 
-             C 65,-25 40,-40 15,-45 
-             C -10,-50 -40,-40 -50,-20 
-             C -55,-10 -50,5 -35,10 
-             C -20,15 0,20 20,35 
+             M 35,55
+             C 55,45 65,25 65,0
+             C 65,-25 40,-40 15,-45
+             C -10,-50 -40,-40 -50,-20
+             C -55,-10 -50,5 -35,10
+             C -20,15 0,20 20,35
              C 30,45 35,55 35,55 Z
-             M 0,-70 
-             L -25,-90 
-             L 25,-90 
+             M 0,-70
+             L -25,-90
+             L 25,-90
              Z"/>
   </g>
 
-  <!-- SKY SMART TEXT - LARGE, fills bottom ~25% of canvas -->
-  <text x="500" y="1170" text-anchor="middle" 
-        font-family="'Georgia', 'Times New Roman', serif" 
-        font-size="145" 
-        font-weight="900" 
-        letter-spacing="18"
-        fill="url(#goldGrad2)"
-        filter="url(#goldShine2)">SKY SMART</text>
-
-  <text x="500" y="1265" text-anchor="middle" 
-        font-family="'Georgia', 'Times New Roman', serif" 
-        font-size="40" 
-        font-style="italic"
-        letter-spacing="6"
-        fill="url(#goldGrad2)"
-        opacity="0.85">Clothing &amp; Apparel</text>
+  <!-- ============ SKY SMART GOLD TEXT (fills bottom, serif) ============ -->
+  <text x="700" y="1520" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="185"
+        font-weight="900"
+        letter-spacing="22"
+        fill="url(#goldG)"
+        filter="url(#gs)">SKY SMART</text>
 </svg>
