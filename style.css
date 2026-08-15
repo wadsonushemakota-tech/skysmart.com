@@ -73,6 +73,24 @@ body {
     filter: brightness(1.2);
 }
 
+.logo-img {
+    height: 70px;
+    max-width: 220px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    display: block;
+}
+
+.logo-img:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 8px rgba(13, 44, 99, 0.4)) brightness(1.1);
+}
+
+.icon .logo-img {
+    margin: 5px 0;
+}
+
 .menu{
     flex: 1;
     display: flex;
@@ -571,6 +589,16 @@ ul li a:hover{
 
 .slide-1 { animation-delay: 0s; z-index: 1; }
 .slide-2 { animation-delay: 5s; z-index: 2; }
+
+.about-logo-icon {
+    background: #000;
+    padding: 28px;
+}
+
+.about-logo-full {
+    background: #fff;
+    padding: 20px;
+}
 
 @keyframes slideFade {
     0%   { opacity: 0; }
@@ -2011,6 +2039,11 @@ html, body {
     .logo {
         font-size: 30px;
         order: 2;
+    }
+
+    .logo-img {
+        height: 50px;
+        max-width: 160px;
     }
 
     .menu {

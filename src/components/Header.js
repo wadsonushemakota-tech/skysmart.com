@@ -8,9 +8,13 @@ const Header = ({ cart, wishlist, navigateTo, currentPage, onOpenCart, onOpenWis
     <header className="navbar">
       <div className="navbar-container">
         <div className="logo">
-          <h2 onClick={() => navigateTo('home')} style={{ cursor: 'pointer' }}>
-            Sky Smart
-          </h2>
+          <img 
+            src="images/logo-sky-smart-compact.svg" 
+            alt="Sky Smart Logo" 
+            className="logo-img"
+            onClick={() => navigateTo('home')} 
+            style={{ cursor: 'pointer' }}
+          />
         </div>
 
         <nav className="menu menu-desktop">

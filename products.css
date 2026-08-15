@@ -9,6 +9,20 @@
     color: #ff8c42;
 }
 
+.logo-img {
+    height: 70px;
+    max-width: 220px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    display: block;
+}
+
+.logo-img:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 8px rgba(13, 44, 99, 0.4)) brightness(1.1);
+}
+
 .products-hero {
     background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('images/1.jpg');
     background-size: cover;
