@@ -1,101 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Smart — Our Designs</title>
-    <meta name="description" content="Explore Sky Smart Design Studio: logos, brand identity, social media, posters, t-shirt printing, and packaging.">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Studio & Sky Smart Collection | Sky Smart</title>
+<meta name="description" content="Custom T-shirt printing, logos and brand design, plus the Sky Smart Collection of branded shirts, hoodies and caps.">
+<meta name="theme-color" content="#0f1f4b">
+<meta property="og:title" content="Design Studio & Sky Smart Collection | Sky Smart">
+<meta property="og:description" content="Custom T-shirt printing, logos and brand design, plus the Sky Smart Collection of branded shirts, hoodies and caps.">
+<meta property="og:image" content="images/about-crest.jpg">
+<link rel="icon" type="image/png" href="images/crest-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="sections.css">
+
 </head>
 <body>
-    <div class="main">
-        <div class="navbar">
-            <div class="icon">
-                <h2 class="logo" onclick="window.location.href='index.html'">Sky Smart</h2>
-            </div>
-            <div class="menu">
-                <ul>
-                    <li><a href="index.html#home">HOME</a></li>
-                    <li><a href="index.html#about">ABOUT</a></li>
-                    <li><a href="products.html">PRODUCTS</a></li>
-                    <li><a href="designs.html" class="back-home-nav">OUR DESIGNS</a></li>
-                    <li><a href="index.html#contact">CONTACT</a></li>
-                </ul>
-            </div>
-            <div class="cart-icon">
-                <a href="#" class="cart-link" title="Shopping Cart">
-                    <span class="cart-icon-text">🛒</span>
-                    <span class="cart-count">0</span>
-                </a>
-            </div>
-            <div class="wishlist-icon">
-                <a href="#" class="wishlist-link" title="Wishlist">
-                    <span class="wishlist-icon-text">❤️</span>
-                    <span class="wishlist-count">0</span>
-                </a>
-            </div>
-            <div class="search">
-                <input class="srch" type="search" placeholder="Search products...">
-                <button class="btn">Search</button>
-            </div>
-        </div>
-
-        <div class="content" style="justify-content:center;">
-            <div class="hero-content" style="max-width:900px; text-align:center;">
-                <h1>Designs That Speak<br><span>Sky Smart Studio</span><br>Bold. Clean. Modern.</h1>
-                <p class="par">Welcome to our design studio. We craft memorable visuals — from logos and brand systems to social media, posters and apparel prints. If you have an idea, we will shape it into something you are proud to show.</p>
-                <button class="cn"><a href="#designs">VIEW SERVICES</a></button>
-            </div>
+<a class="visually-hidden" href="#main">Skip to content</a>
+<div class="announce">Pay with <strong>EcoCash</strong>, <strong>bank transfer</strong> or <strong>cash</strong> · Free collection in Bulawayo · Delivery across Zimbabwe on request</div>
+<header class="site-header">
+    <div class="wrap">
+        <a class="brand" href="index.html" aria-label="Sky Smart home">
+            <img src="images/crest-mark.png" alt="" width="42" height="36">
+            <span class="brand-name">SKY SMART<small>CLOTHING &amp; APPAREL</small></span>
+        </a>
+        <nav class="main-nav" aria-label="Main">
+            <button type="button" class="icon-btn nav-close" data-menu-close aria-label="Close menu"><ion-icon name="close"></ion-icon></button>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Shop</a></li>
+                <li><a href="designs.html">Design Studio</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="track.html">Track order</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <button type="button" class="icon-btn" data-search-toggle aria-label="Search products"><ion-icon name="search-outline"></ion-icon></button>
+            <a class="icon-btn" href="checkout.html" data-bag-open aria-label="Open your bag"><ion-icon name="bag-handle-outline"></ion-icon><span class="bag-count" hidden>0</span></a>
+            <button type="button" class="icon-btn menu-toggle" data-menu-open aria-label="Open menu"><ion-icon name="menu-outline"></ion-icon></button>
         </div>
     </div>
-
-    <section id="designs" class="designs">
-        <div class="designs-hero">
-            <h2>Our Designs</h2>
-            <p>Clean, modern and impactful visuals for brands, events and everyday wear. Designed with clarity, balance and strong typography.</p>
-            <div class="designs-cta">
-                <a href="index.html#contact" class="designs-btn">Start a Project</a>
-                <a href="#collection" class="designs-btn alt">Shop the Collection</a>
-            </div>
+    <div class="header-search">
+        <form action="products.html" role="search">
+            <input type="search" name="q" placeholder="Search sneakers, e.g. Jordan 4" aria-label="Search products">
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        </form>
+    </div>
+</header>
+<main id="main">
+<section class="page-hero">
+    <div class="wrap">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Design Studio</div>
+        <h1>Sky Smart Design Studio</h1>
+        <p>Custom T-shirt printing, logos and brand design for teams, churches, schools, businesses and events, plus our own Sky Smart Collection.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px">
+            <a href="#start" class="btn btn-gold">Start a project</a>
+            <a href="#collection" class="btn btn-light">Shop the collection</a>
         </div>
+    </div>
+</section>
 
-        <div class="designs-grid">
-            <div class="design-card">
-                <div class="design-card-icon">🎨</div>
-                <div class="design-card-title">Logo Design</div>
-                <div class="design-card-text">Memorable logos with strong typography and simple geometry.</div>
-            </div>
-            <div class="design-card">
-                <div class="design-card-icon">✨</div>
-                <div class="design-card-title">Brand Identity</div>
-                <div class="design-card-text">Premium color systems, font pairings and usage guidelines.</div>
-            </div>
-            <div class="design-card">
-                <div class="design-card-icon">📱</div>
-                <div class="design-card-title">Social Media</div>
-                <div class="design-card-text">Posts, banners and promos that stand out and convert.</div>
-            </div>
-            <div class="design-card">
-                <div class="design-card-icon">🖨️</div>
-                <div class="design-card-title">Posters & Flyers</div>
-                <div class="design-card-text">Bold layouts with clear hierarchy for events and promos.</div>
-            </div>
-            <div class="design-card">
-                <div class="design-card-icon">👕</div>
-                <div class="design-card-title">T‑Shirt Printing</div>
-                <div class="design-card-text">Sharp, durable prints for teams, brands and personal wear.</div>
-            </div>
-            <div class="design-card">
-                <div class="design-card-icon">📦</div>
-                <div class="design-card-title">Packaging</div>
-                <div class="design-card-text">Minimal packaging that elevates product perception.</div>
-            </div>
+<section class="section section-white" aria-labelledby="services-title">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <span class="eyebrow">What we do</span>
+            <h2 id="services-title">Design &amp; print services</h2>
+            <p>Clean, modern visuals with clear structure and strong typography, designed with you from the first idea.</p>
         </div>
+        <div class="services">
+            <div class="service reveal"><span class="service-icon"><ion-icon name="shirt-outline"></ion-icon></span><h3>T-shirt printing</h3><p>Sharp, durable prints for teams, churches, schools, businesses and personal wear.</p></div>
+            <div class="service reveal"><span class="service-icon"><ion-icon name="color-palette-outline"></ion-icon></span><h3>Logo design</h3><p>Memorable logos with strong typography and simple geometry.</p></div>
+            <div class="service reveal"><span class="service-icon"><ion-icon name="diamond-outline"></ion-icon></span><h3>Brand identity</h3><p>Colours, fonts and usage guidelines that make your brand feel premium.</p></div>
+            <div class="service reveal"><span class="service-icon"><ion-icon name="phone-portrait-outline"></ion-icon></span><h3>Social media</h3><p>Posts, banners and promos that stand out and bring customers in.</p></div>
+            <div class="service reveal"><span class="service-icon"><ion-icon name="megaphone-outline"></ion-icon></span><h3>Posters &amp; flyers</h3><p>Bold layouts with clear hierarchy for events and promotions.</p></div>
+            <div class="service reveal"><span class="service-icon"><ion-icon name="cube-outline"></ion-icon></span><h3>Packaging</h3><p>Minimal packaging that lifts how your product is seen.</p></div>
+        </div>
+    </div>
+</section>
 
-        <div class="designs-note">Have a unique idea? Share it and we will craft it with you.</div>
-    </section>
+<section class="section section-dark" id="start" aria-labelledby="process-title">
+    <div class="wrap">
+        <div class="section-head light reveal">
+            <span class="eyebrow">How it works</span>
+            <h2 id="process-title">From idea to finished print</h2>
+            <p>Tell us what you need. We'll guide you through every step.</p>
+        </div>
+        <div class="steps">
+            <div class="step reveal"><ion-icon name="chatbubble-ellipses-outline"></ion-icon><h3>Share your idea</h3><p>Send us your idea, logo, quantity and deadline on WhatsApp.</p></div>
+            <div class="step reveal"><ion-icon name="brush-outline"></ion-icon><h3>We design</h3><p>We create a design and send you a preview to look at.</p></div>
+            <div class="step reveal"><ion-icon name="thumbs-up-outline"></ion-icon><h3>You approve</h3><p>Ask for changes until it's right, then confirm the quote.</p></div>
+            <div class="step reveal"><ion-icon name="print-outline"></ion-icon><h3>We print &amp; deliver</h3><p>Collect in Bulawayo or we arrange delivery to you.</p></div>
+        </div>
+        <div class="center-cta">
+            <a class="btn btn-wa" target="_blank" rel="noopener"
+               href="https://wa.me/263777076575?text=Hi%20Sky%20Smart!%20I'd%20like%20to%20start%20a%20design%2Fprinting%20project.%0AWhat%20I%20need%3A%20%0AQuantity%3A%20%0ADeadline%3A%20"><ion-icon name="logo-whatsapp"></ion-icon> Start a project on WhatsApp</a>
+        </div>
+    </div>
+</section>
 
-    <!-- Sky Smart branded merchandise -->
+<!-- Sky Smart branded merchandise -->
     <section id="collection" class="collection">
         <div class="collection-head">
             <p class="collection-eyebrow">Wear the brand</p>
@@ -229,7 +235,7 @@
         <p class="collection-note">Sizes, colours and prices on request. Custom team or event orders welcome — <a href="https://wa.me/263777076575" target="_blank" rel="noopener">chat with us on WhatsApp</a>.</p>
     </section>
 
-    <dialog id="collection-viewer" class="collection-viewer" aria-label="Product photo">
+<dialog id="collection-viewer" class="collection-viewer" aria-label="Product photo">
         <button type="button" class="collection-viewer-close" aria-label="Close">&times;</button>
         <img src="" alt="">
         <div class="collection-viewer-caption">
@@ -237,78 +243,72 @@
             <a class="collection-order" href="#" target="_blank" rel="noopener">Order on WhatsApp</a>
         </div>
     </dialog>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Sky Smart</h3>
-                <p>Your ultimate destination for fashion and footwear! We bring you the latest trends in shoes and clothing with style, comfort, and affordability.</p>
-                <div class="social-links">
-                    <a href="https://www.facebook.com/share/1FD43wC8ig/?mibextid=wwXIfr" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>
-                    <a href="https://whatsapp.com/channel/0029Vb6ACAq4Y9lsysBXJV2G" target="_blank"><ion-icon name="logo-whatsapp"></ion-icon></a>
-                    <a href="https://www.instagram.com/wadson_sky_walker04?igsh=ZjhsbTFicjV6aGJk&utm_source=qr" target="_blank"><ion-icon name="logo-instagram"></ion-icon></a>
-                    <a href="https://www.tiktok.com/@user912757331786mbomah?_t=ZM-8zvSm1YZMjI&_r=1" target="_blank"><ion-icon name="logo-tiktok"></ion-icon></a>
-                    <a href="https://youtube.com/@wadsonushemakota?si=9MX199T-Br-itTaP" target="_blank"><ion-icon name="logo-youtube"></ion-icon></a>
+</main>
+<footer class="site-footer">
+    <div class="wrap">
+        <div class="footer-grid">
+            <div>
+                <a class="brand" href="index.html" aria-label="Sky Smart home">
+                    <img src="images/crest-mark.png" alt="" width="42" height="36">
+                    <span class="brand-name">SKY SMART<small>CLOTHING &amp; APPAREL</small></span>
+                </a>
+                <p>Quality sneakers, everyday fashion, custom printing and our own Sky Smart brand, from Bulawayo to the rest of Zimbabwe.</p>
+                <div class="social-row">
+                    <a href="https://www.facebook.com/share/1FD43wC8ig/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="https://whatsapp.com/channel/0029Vb6ACAq4Y9lsysBXJV2G" target="_blank" rel="noopener" aria-label="WhatsApp channel"><ion-icon name="logo-whatsapp"></ion-icon></a>
+                    <a href="https://www.instagram.com/wadson_sky_walker04?igsh=ZjhsbTFicjV6aGJk&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
+                    <a href="https://www.tiktok.com/@user912757331786mbomah?_t=ZM-8zvSm1YZMjI&amp;_r=1" target="_blank" rel="noopener" aria-label="TikTok"><ion-icon name="logo-tiktok"></ion-icon></a>
+                    <a href="https://youtube.com/@wadsonushemakota?si=9MX199T-Br-itTaP" target="_blank" rel="noopener" aria-label="YouTube"><ion-icon name="logo-youtube"></ion-icon></a>
                 </div>
             </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
+            <div>
+                <h3>Shop</h3>
                 <ul>
-                    <li><a href="index.html#home">Home</a></li>
-                    <li><a href="index.html#about">About</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="designs.html">Our Designs</a></li>
-                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="products.html">All products</a></li>
+                    <li><a href="products.html?cat=jordans">Jordans</a></li>
+                    <li><a href="products.html?cat=nike">Nike</a></li>
+                    <li><a href="designs.html#collection">Sky Smart Collection</a></li>
+                    <li><a href="designs.html">Custom printing &amp; design</a></li>
                 </ul>
             </div>
-            <div class="footer-section">
-                <h3>Contact Info</h3>
-                <p><ion-icon name="mail-outline"></ion-icon> wadsonushemakota@gmail.com</p>
-                <p><ion-icon name="call-outline"></ion-icon> +263 77 707 6575</p>
-                <p><ion-icon name="location-outline"></ion-icon> Bulawayo, Zimbabwe</p>
+            <div>
+                <h3>Help</h3>
+                <ul>
+                    <li><a href="index.html#how-to-order">How to order</a></li>
+                    <li><a href="index.html#how-to-order">Payment options</a></li>
+                    <li><a href="track.html">Track your order</a></li>
+                    <li><a href="index.html#community">Community chat</a></li>
+                    <li><a href="index.html#contact">Contact us</a></li>
+                </ul>
             </div>
-            <div class="footer-section newsletter-section">
-                <h3>Stay Updated</h3>
-                <p>Subscribe to our newsletter for the latest fashion trends and exclusive offers!</p>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Enter your email" id="newsletter-email" required>
-                    <button type="submit" id="newsletter-submit">Subscribe</button>
+            <div>
+                <h3>Contact</h3>
+                <ul class="footer-contact">
+                    <li><ion-icon name="logo-whatsapp"></ion-icon><a href="https://wa.me/263777076575" target="_blank" rel="noopener">+263 77 707 6575</a></li>
+                    <li><ion-icon name="mail-outline"></ion-icon><a href="mailto:wadsonushemakota@gmail.com">wadsonushemakota@gmail.com</a></li>
+                    <li><ion-icon name="location-outline"></ion-icon><span>Bulawayo, Zimbabwe</span></li>
+                </ul>
+                <div class="footer-pay" aria-label="Payment methods">
+                    <span>ECOCASH</span><span>BANK TRANSFER</span><span>CASH</span>
                 </div>
-                <div id="newsletter-message" class="newsletter-message"></div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Sky Smart. All Rights Reserved.</p>
+            <span>&copy; <span data-year>2026</span> Sky Smart. All rights reserved.</span>
+            <span class="footer-verse">“I can do all things through Christ who strengthens me.” Philippians 4:13</span>
         </div>
-    </footer>
-
-    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
-    <script>
-        const newsletterForm = document.getElementById('newsletter-email');
-        const newsletterSubmit = document.getElementById('newsletter-submit');
-        const newsletterMessage = document.getElementById('newsletter-message');
-
-        if (newsletterSubmit && newsletterForm) {
-            newsletterSubmit.addEventListener('click', function() {
-                const email = newsletterForm.value.trim();
-                if (!email) { showNewsletterMessage('Please enter your email address.', 'error'); return; }
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) { showNewsletterMessage('Please enter a valid email address.', 'error'); return; }
-                showNewsletterMessage('Thank you for subscribing! You\'ll receive our latest updates.', 'success');
-                newsletterForm.value = '';
-                const subscribers = JSON.parse(localStorage.getItem('skySmartSubscribers') || '[]');
-                if (!subscribers.includes(email)) {
-                    subscribers.push(email);
-                    localStorage.setItem('skySmartSubscribers', JSON.stringify(subscribers));
-                }
-            });
-
-            newsletterForm.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') { newsletterSubmit.click(); }
-            });
-        }
-
-        // Sky Smart Collection: WhatsApp order links, category filters, photo viewer
+    </div>
+</footer>
+<a class="wa-float" href="https://wa.me/263777076575" target="_blank" rel="noopener" aria-label="Chat with Sky Smart on WhatsApp"><ion-icon name="logo-whatsapp"></ion-icon></a>
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
+<script src="api-config.js"></script>
+<script src="api-base.js"></script>
+<script src="catalog.js"></script>
+<script src="shop.js"></script>
+<script>
+(function () {
+// Sky Smart Collection: WhatsApp order links, category filters, photo viewer
         const WHATSAPP_NUMBER = '263777076575';
         const orderLink = (name) =>
             `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi Sky Smart! I'd like to order the ${name}. What sizes and prices are available?`)}`;
@@ -354,14 +354,7 @@
             // Click on the dark backdrop closes it
             viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
         }
-
-        function showNewsletterMessage(message, type) {
-            if (!newsletterMessage) return;
-            newsletterMessage.textContent = message;
-            newsletterMessage.className = `newsletter-message ${type}`;
-            newsletterMessage.style.display = 'block';
-            setTimeout(() => { newsletterMessage.style.display = 'none'; }, 5000);
-        }
-    </script>
+})();
+</script>
 </body>
 </html>

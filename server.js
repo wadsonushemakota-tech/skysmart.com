@@ -86,8 +86,8 @@ pool.on('error', (err) => {
     console.error('Postgres idle client error:', err.message);
 });
 
-// Set once the messages table is ready; until then chat falls back to an in-memory store
-let chatDbReady = false;
+// Set once the tables exist; until then chat uses an in-memory store and ordering is disabled
+let dbReady = false;
 
 // Database Initialization
 const initDb = async () => {
@@ -97,7 +97,7 @@ const initDb = async () => {
         
         await ensureSchema(client);
 
-        chatDbReady = true;
+        dbReady = true;
         console.log('✅ Database tables initialized');
 
         // Check if products exist, if not seed them
@@ -284,7 +284,7 @@ function publicMessage(row) {
 const memoryChat = { rows: [], nextId: 1 };
 const chatStore = {
     async recent() {
-        if (!chatDbReady) return memoryChat.rows.slice(-CHAT_HISTORY_LIMIT);
+        if (!dbReady) return memoryChat.rows.slice(-CHAT_HISTORY_LIMIT);
         const res = await pool.query(
             'SELECT * FROM (SELECT * FROM messages ORDER BY id DESC LIMIT $1) m ORDER BY id ASC',
             [CHAT_HISTORY_LIMIT]
@@ -293,7 +293,7 @@ const chatStore = {
     },
 
     async insert(m, clientId) {
-        if (!chatDbReady) {
+        if (!dbReady) {
             const row = {
                 id: memoryChat.nextId++,
                 username: m.user,
@@ -323,7 +323,7 @@ const chatStore = {
     },
 
     async remove(id, clientId) {
-        if (!chatDbReady) {
+        if (!dbReady) {
             const row = memoryChat.rows.find((r) => r.id === id && r.sender_id === clientId && !r.deleted);
             if (!row) return null;
             Object.assign(row, { deleted: true, text: null, media_url: null, reactions: {} });
@@ -340,7 +340,7 @@ const chatStore = {
 
     // emoji === null removes this sender's reaction
     async react(id, tag, emoji) {
-        if (!chatDbReady) {
+        if (!dbReady) {
             const row = memoryChat.rows.find((r) => r.id === id && !r.deleted);
             if (!row) return null;
             const next = { ...row.reactions };
@@ -365,7 +365,7 @@ const chatStore = {
 
     // Marks other people's messages up to upToId as seen; returns the ids that changed
     async markSeen(upToId, clientId) {
-        if (!chatDbReady) {
+        if (!dbReady) {
             const ids = [];
             memoryChat.rows.forEach((r) => {
                 if (r.id <= upToId && !r.seen && r.sender_id !== clientId) {
@@ -399,7 +399,7 @@ io.on('connection', async (socket) => {
     const tag = senderTag(clientId);
     socket.data.clientId = clientId;
 
-    socket.emit('session', { sender: tag, reactions: CHAT_REACTIONS, persistent: chatDbReady });
+    socket.emit('session', { sender: tag, reactions: CHAT_REACTIONS, persistent: dbReady });
     broadcastPresence();
 
     try {
@@ -756,6 +756,193 @@ app.post('/api/payments/create-checkout-session', async (req, res) => {
             success: false,
             message: err.message || 'Could not start checkout.',
         });
+    }
+});
+
+// ---- Shop orders ----
+const catalog = require('./catalog');
+const ORDER_STATUSES = ['pending_payment', 'paid', 'ready', 'shipped', 'completed', 'cancelled'];
+const PAYMENT_METHODS = ['ecocash', 'bank', 'cash'];
+const DELIVERY_METHODS = ['collect', 'delivery'];
+const ADMIN_KEY = (process.env.ADMIN_KEY || '').trim();
+const recentOrdersByIp = new Map(); // ip -> timestamps, simple abuse guard
+
+function phoneDigits(value) {
+    return String(value || '').replace(/\D/g, '');
+}
+
+// Unambiguous characters only (no 0/O, 1/I/L)
+function newOrderCode() {
+    const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    const bytes = crypto.randomBytes(6);
+    return 'SS-' + Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
+}
+
+// Returns { order } with server-computed prices, or { error }
+function validateOrder(body) {
+    const b = body || {};
+    const customer = b.customer || {};
+    const delivery = b.delivery || {};
+    const name = cleanString(customer.name, 60);
+    const phone = cleanString(customer.phone, 30);
+    const email = cleanString(customer.email, 120);
+    if (!name || name.length < 2) return { error: 'Please enter your full name.' };
+    const digits = phoneDigits(phone);
+    if (digits.length < 9 || digits.length > 15) return { error: 'Please enter a valid phone number.' };
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: 'Please enter a valid email address.' };
+    if (!DELIVERY_METHODS.includes(delivery.method)) return { error: 'Please choose collection or delivery.' };
+    const address = delivery.method === 'delivery' ? cleanString(delivery.address, 200) : null;
+    const city = delivery.method === 'delivery' ? cleanString(delivery.city, 60) : null;
+    if (delivery.method === 'delivery' && (!address || !city)) return { error: 'Please enter your delivery address and city.' };
+    if (!PAYMENT_METHODS.includes(b.payment)) return { error: 'Please choose a payment method.' };
+
+    const lines = Array.isArray(b.items) ? b.items : [];
+    if (!lines.length) return { error: 'Your bag is empty.' };
+    if (lines.length > 30) return { error: 'Too many items in one order.' };
+    const items = [];
+    for (const line of lines) {
+        const product = catalog.byId[line && line.id];
+        if (!product) return { error: 'One of the items is no longer available. Please refresh your bag.' };
+        const size = String((line && line.size) || '');
+        if (!product.sizes.includes(size)) return { error: `Please choose a size for ${product.name}.` };
+        const qty = Number(line.qty);
+        if (!Number.isInteger(qty) || qty < 1 || qty > 10) return { error: 'Quantity must be between 1 and 10.' };
+        items.push({ id: product.id, name: product.name, size, qty, price: product.price, image: product.image });
+    }
+    const subtotal = Math.round(items.reduce((s, i) => s + i.price * i.qty, 0) * 100) / 100;
+    return {
+        order: {
+            customer_name: name,
+            phone,
+            email,
+            delivery_method: delivery.method,
+            address,
+            city,
+            payment_method: b.payment,
+            notes: cleanString(b.notes, 500),
+            items,
+            subtotal,
+        },
+    };
+}
+
+function publicOrder(row) {
+    return {
+        code: row.code,
+        status: row.status,
+        customerName: row.customer_name,
+        deliveryMethod: row.delivery_method,
+        city: row.city,
+        paymentMethod: row.payment_method,
+        items: row.items,
+        subtotal: Number(row.subtotal),
+        currency: row.currency,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    };
+}
+
+app.post('/api/orders', async (req, res) => {
+    if (!dbReady) {
+        return res.status(503).json({ success: false, message: 'Ordering is temporarily unavailable. Please order on WhatsApp.' });
+    }
+    const ip = req.ip || 'unknown';
+    const now = Date.now();
+    const recent = (recentOrdersByIp.get(ip) || []).filter((t) => now - t < 10 * 60 * 1000);
+    if (recent.length >= 5) {
+        return res.status(429).json({ success: false, message: 'Too many orders from this device. Please wait a few minutes or contact us on WhatsApp.' });
+    }
+    const { order, error } = validateOrder(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
+
+    try {
+        let row;
+        for (let attempt = 0; attempt < 5 && !row; attempt++) {
+            try {
+                const result = await pool.query(
+                    `INSERT INTO orders (code, customer_name, phone, email, delivery_method, address, city, payment_method, notes, items, subtotal)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+                    [newOrderCode(), order.customer_name, order.phone, order.email, order.delivery_method, order.address,
+                        order.city, order.payment_method, order.notes, JSON.stringify(order.items), order.subtotal]
+                );
+                row = result.rows[0];
+            } catch (err) {
+                if (err.code !== '23505') throw err; // retry only on duplicate code
+            }
+        }
+        recent.push(now);
+        recentOrdersByIp.set(ip, recent);
+        console.log(`🛍  New order ${row.code}: $${row.subtotal} via ${row.payment_method}`);
+        res.status(201).json({ success: true, order: publicOrder(row) });
+    } catch (err) {
+        console.error('Order save failed:', err.message);
+        res.status(500).json({ success: false, message: 'Could not place your order. Please try again or order on WhatsApp.' });
+    }
+});
+
+// Customers look up their own order with the order number + the phone number used
+app.get('/api/orders/:code', async (req, res) => {
+    if (!dbReady) return res.status(503).json({ success: false, message: 'Order tracking is temporarily unavailable.' });
+    const code = String(req.params.code || '').trim().toUpperCase();
+    const digits = phoneDigits(req.query.phone);
+    if (!/^SS-[A-Z0-9]{6}$/.test(code) || digits.length < 9) {
+        return res.status(400).json({ success: false, message: 'Enter your order number (e.g. SS-7K2QX9) and phone number.' });
+    }
+    try {
+        const { rows } = await pool.query('SELECT * FROM orders WHERE code = $1', [code]);
+        const row = rows[0];
+        // Compare the last 9 digits so 077..., +26377... and 26377... all match
+        if (!row || phoneDigits(row.phone).slice(-9) !== digits.slice(-9)) {
+            return res.status(404).json({ success: false, message: 'No order found with that number and phone.' });
+        }
+        res.json({ success: true, order: publicOrder(row) });
+    } catch (err) {
+        console.error('Order lookup failed:', err.message);
+        res.status(500).json({ success: false, message: 'Could not look up the order. Try again.' });
+    }
+});
+
+function requireAdmin(req, res, next) {
+    if (!ADMIN_KEY) return res.status(503).json({ success: false, message: 'Admin is not configured (set ADMIN_KEY).' });
+    const given = Buffer.from(String(req.get('x-admin-key') || ''));
+    const expected = Buffer.from(ADMIN_KEY);
+    if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
+        return res.status(401).json({ success: false, message: 'Wrong admin key.' });
+    }
+    if (!dbReady) return res.status(503).json({ success: false, message: 'Database is not connected.' });
+    next();
+}
+
+app.get('/api/admin/orders', requireAdmin, async (req, res) => {
+    try {
+        const status = ORDER_STATUSES.includes(req.query.status) ? req.query.status : null;
+        const { rows } = await pool.query(
+            `SELECT * FROM orders ${status ? 'WHERE status = $1' : ''} ORDER BY created_at DESC LIMIT 300`,
+            status ? [status] : []
+        );
+        res.json({
+            success: true,
+            orders: rows.map((r) => ({ ...publicOrder(r), phone: r.phone, email: r.email, address: r.address, notes: r.notes, adminNote: r.admin_note })),
+        });
+    } catch (err) {
+        console.error('Admin order list failed:', err.message);
+        res.status(500).json({ success: false, message: 'Could not load orders.' });
+    }
+});
+
+app.patch('/api/admin/orders/:code', requireAdmin, async (req, res) => {
+    const status = req.body && req.body.status;
+    if (!ORDER_STATUSES.includes(status)) return res.status(400).json({ success: false, message: 'Unknown status.' });
+    try {
+        const { rows } = await pool.query(
+            `UPDATE orders SET status = $1, admin_note = COALESCE($2, admin_note), updated_at = NOW() WHERE code = $3 RETURNING *`,
+            [status, cleanString(req.body.note, 300), String(req.params.code).toUpperCase()]
+        );
+        if (!rows[0]) return res.status(404).json({ success: false, message: 'Order not found.' });
+        res.json({ success: true, order: publicOrder(rows[0]) });
+    } catch (err) {
+        console.error('Admin order update failed:', err.message);
+        res.status(500).json({ success: false, message: 'Could not update the order.' });
     }
 });
 

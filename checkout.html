@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | Sky Smart</title>
+<meta name="description" content="Complete your Sky Smart order. Pay with EcoCash, bank transfer or cash.">
+<meta name="theme-color" content="#0f1f4b">
+<meta property="og:title" content="Checkout | Sky Smart">
+<meta property="og:description" content="Complete your Sky Smart order. Pay with EcoCash, bank transfer or cash.">
+<meta property="og:image" content="images/about-crest.jpg">
+<link rel="icon" type="image/png" href="images/crest-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+
+<meta name="robots" content="noindex">
+</head>
+<body>
+<a class="visually-hidden" href="#main">Skip to content</a>
+<div class="announce">Pay with <strong>EcoCash</strong>, <strong>bank transfer</strong> or <strong>cash</strong> · Free collection in Bulawayo · Delivery across Zimbabwe on request</div>
+<header class="site-header">
+    <div class="wrap">
+        <a class="brand" href="index.html" aria-label="Sky Smart home">
+            <img src="images/crest-mark.png" alt="" width="42" height="36">
+            <span class="brand-name">SKY SMART<small>CLOTHING &amp; APPAREL</small></span>
+        </a>
+        <nav class="main-nav" aria-label="Main">
+            <button type="button" class="icon-btn nav-close" data-menu-close aria-label="Close menu"><ion-icon name="close"></ion-icon></button>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Shop</a></li>
+                <li><a href="designs.html">Design Studio</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="track.html">Track order</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <button type="button" class="icon-btn" data-search-toggle aria-label="Search products"><ion-icon name="search-outline"></ion-icon></button>
+            <a class="icon-btn" href="checkout.html" data-bag-open aria-label="Open your bag"><ion-icon name="bag-handle-outline"></ion-icon><span class="bag-count" hidden>0</span></a>
+            <button type="button" class="icon-btn menu-toggle" data-menu-open aria-label="Open menu"><ion-icon name="menu-outline"></ion-icon></button>
+        </div>
+    </div>
+    <div class="header-search">
+        <form action="products.html" role="search">
+            <input type="search" name="q" placeholder="Search sneakers, e.g. Jordan 4" aria-label="Search products">
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        </form>
+    </div>
+</header>
+<main id="main">
+<section class="page-hero" style="padding:44px 0 40px">
+    <div class="wrap">
+        <div class="breadcrumb"><a href="index.html">Home</a> / <a href="products.html">Shop</a> / Checkout</div>
+        <h1>Checkout</h1>
+        <p>No account needed. You'll get an order number and clear payment steps.</p>
+    </div>
+</section>
+
+<div class="wrap">
+    <div id="checkout-empty" class="confirm" hidden>
+        <div class="confirm-head">
+            <div class="confirm-check" style="background:var(--gold-soft);color:var(--navy)"><ion-icon name="bag-handle-outline"></ion-icon></div>
+            <h2>Your bag is empty</h2>
+            <p style="color:var(--muted)">Add a pair you love, then come back here to check out.</p>
+            <a href="products.html" class="btn btn-primary">Start shopping</a>
+        </div>
+    </div>
+
+    <form class="checkout" id="checkout-form" novalidate hidden>
+        <div class="checkout-main">
+            <div class="alert alert-error" id="checkout-error" role="alert" hidden></div>
+
+            <section class="card" aria-labelledby="step-details">
+                <h2 id="step-details"><span class="num">1</span> Your details</h2>
+                <div class="field">
+                    <label for="c-name">Full name</label>
+                    <input id="c-name" name="name" autocomplete="name" maxlength="60" required>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="c-phone">Phone / WhatsApp number</label>
+                        <input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="e.g. 077 123 4567" maxlength="30" required>
+                    </div>
+                    <div class="field">
+                        <label for="c-email">Email <span class="opt">(optional)</span></label>
+                        <input id="c-email" name="email" type="email" autocomplete="email" maxlength="120">
+                    </div>
+                </div>
+                <p class="field-hint">We'll use your number to confirm the order on WhatsApp.</p>
+            </section>
+
+            <section class="card" aria-labelledby="step-delivery">
+                <h2 id="step-delivery"><span class="num">2</span> Delivery</h2>
+                <div class="choices" role="radiogroup" aria-labelledby="step-delivery">
+                    <label class="choice">
+                        <input type="radio" name="delivery" value="collect" checked>
+                        <span class="choice-box">
+                            <span class="choice-icon"><ion-icon name="storefront-outline"></ion-icon></span>
+                            <span><strong>Collect in Bulawayo</strong><span>Free. We'll message you when it's ready.</span></span>
+                            <span class="choice-tick"></span>
+                        </span>
+                    </label>
+                    <label class="choice">
+                        <input type="radio" name="delivery" value="delivery">
+                        <span class="choice-box">
+                            <span class="choice-icon"><ion-icon name="car-outline"></ion-icon></span>
+                            <span><strong>Deliver to me</strong><span>Anywhere in Zimbabwe. Fee confirmed on WhatsApp before you pay.</span></span>
+                            <span class="choice-tick"></span>
+                        </span>
+                    </label>
+                </div>
+                <div id="address-fields" hidden style="margin-top:18px">
+                    <div class="field">
+                        <label for="c-address">Street address</label>
+                        <input id="c-address" name="address" autocomplete="street-address" maxlength="200">
+                    </div>
+                    <div class="field">
+                        <label for="c-city">City / town</label>
+                        <input id="c-city" name="city" autocomplete="address-level2" maxlength="60">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" aria-labelledby="step-payment">
+                <h2 id="step-payment"><span class="num">3</span> Payment</h2>
+                <div class="choices" role="radiogroup" aria-labelledby="step-payment">
+                    <label class="choice">
+                        <input type="radio" name="payment" value="ecocash" checked>
+                        <span class="choice-box">
+                            <span class="choice-icon eco"><ion-icon name="phone-portrait-outline"></ion-icon></span>
+                            <span><strong>EcoCash</strong><span>Send money from your phone. Steps shown after you order.</span></span>
+                            <span class="choice-tick"></span>
+                        </span>
+                    </label>
+                    <label class="choice">
+                        <input type="radio" name="payment" value="bank">
+                        <span class="choice-box">
+                            <span class="choice-icon"><ion-icon name="business-outline"></ion-icon></span>
+                            <span><strong>Bank transfer</strong><span>BancABC, USD or ZWG account.</span></span>
+                            <span class="choice-tick"></span>
+                        </span>
+                    </label>
+                    <label class="choice">
+                        <input type="radio" name="payment" value="cash">
+                        <span class="choice-box">
+                            <span class="choice-icon"><ion-icon name="cash-outline"></ion-icon></span>
+                            <span><strong>Cash</strong><span>Pay when you collect or on delivery.</span></span>
+                            <span class="choice-tick"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="field" style="margin:18px 0 0">
+                    <label for="c-notes">Order notes <span class="opt">(optional)</span></label>
+                    <textarea id="c-notes" name="notes" maxlength="500" placeholder="Anything we should know? e.g. preferred collection time"></textarea>
+                </div>
+            </section>
+        </div>
+
+        <aside class="card summary" aria-labelledby="summary-title">
+            <h2 id="summary-title">Order summary</h2>
+            <div class="summary-items" id="summary-items"></div>
+            <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal"></span></div>
+            <div class="summary-row"><span>Delivery</span><span id="sum-delivery">Free collection</span></div>
+            <div class="summary-row total"><span>Total</span><span id="sum-total"></span></div>
+            <button type="submit" class="btn btn-gold btn-block" id="place-order" style="margin-top:16px">Place order <ion-icon name="arrow-forward"></ion-icon></button>
+            <p class="secure-note"><ion-icon name="lock-closed"></ion-icon> You only pay after you get your order number. Nothing is charged on this website.</p>
+            <a href="#" class="btn btn-outline btn-block btn-sm" id="wa-order" target="_blank" rel="noopener" style="margin-top:10px"><ion-icon name="logo-whatsapp"></ion-icon> Prefer to order on WhatsApp?</a>
+        </aside>
+    </form>
+
+    <div id="confirmation" class="confirm" hidden tabindex="-1"></div>
+</div>
+</main>
+<footer class="site-footer">
+    <div class="wrap">
+        <div class="footer-grid">
+            <div>
+                <a class="brand" href="index.html" aria-label="Sky Smart home">
+                    <img src="images/crest-mark.png" alt="" width="42" height="36">
+                    <span class="brand-name">SKY SMART<small>CLOTHING &amp; APPAREL</small></span>
+                </a>
+                <p>Quality sneakers, everyday fashion, custom printing and our own Sky Smart brand, from Bulawayo to the rest of Zimbabwe.</p>
+                <div class="social-row">
+                    <a href="https://www.facebook.com/share/1FD43wC8ig/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="https://whatsapp.com/channel/0029Vb6ACAq4Y9lsysBXJV2G" target="_blank" rel="noopener" aria-label="WhatsApp channel"><ion-icon name="logo-whatsapp"></ion-icon></a>
+                    <a href="https://www.instagram.com/wadson_sky_walker04?igsh=ZjhsbTFicjV6aGJk&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
+                    <a href="https://www.tiktok.com/@user912757331786mbomah?_t=ZM-8zvSm1YZMjI&amp;_r=1" target="_blank" rel="noopener" aria-label="TikTok"><ion-icon name="logo-tiktok"></ion-icon></a>
+                    <a href="https://youtube.com/@wadsonushemakota?si=9MX199T-Br-itTaP" target="_blank" rel="noopener" aria-label="YouTube"><ion-icon name="logo-youtube"></ion-icon></a>
+                </div>
+            </div>
+            <div>
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="products.html">All products</a></li>
+                    <li><a href="products.html?cat=jordans">Jordans</a></li>
+                    <li><a href="products.html?cat=nike">Nike</a></li>
+                    <li><a href="designs.html#collection">Sky Smart Collection</a></li>
+                    <li><a href="designs.html">Custom printing &amp; design</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Help</h3>
+                <ul>
+                    <li><a href="index.html#how-to-order">How to order</a></li>
+                    <li><a href="index.html#how-to-order">Payment options</a></li>
+                    <li><a href="track.html">Track your order</a></li>
+                    <li><a href="index.html#community">Community chat</a></li>
+                    <li><a href="index.html#contact">Contact us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Contact</h3>
+                <ul class="footer-contact">
+                    <li><ion-icon name="logo-whatsapp"></ion-icon><a href="https://wa.me/263777076575" target="_blank" rel="noopener">+263 77 707 6575</a></li>
+                    <li><ion-icon name="mail-outline"></ion-icon><a href="mailto:wadsonushemakota@gmail.com">wadsonushemakota@gmail.com</a></li>
+                    <li><ion-icon name="location-outline"></ion-icon><span>Bulawayo, Zimbabwe</span></li>
+                </ul>
+                <div class="footer-pay" aria-label="Payment methods">
+                    <span>ECOCASH</span><span>BANK TRANSFER</span><span>CASH</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; <span data-year>2026</span> Sky Smart. All rights reserved.</span>
+            <span class="footer-verse">“I can do all things through Christ who strengthens me.” Philippians 4:13</span>
+        </div>
+    </div>
+</footer>
+<a class="wa-float" href="https://wa.me/263777076575" target="_blank" rel="noopener" aria-label="Chat with Sky Smart on WhatsApp"><ion-icon name="logo-whatsapp"></ion-icon></a>
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
+<script src="api-config.js"></script>
+<script src="api-base.js"></script>
+<script src="catalog.js"></script>
+<script src="shop.js"></script>
+<script src="checkout.js"></script>
+</body>
+</html>

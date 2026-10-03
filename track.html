@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop Sneakers & Footwear | Sky Smart</title>
-<meta name="description" content="Browse Jordans, Nike, Adidas and lifestyle sneakers at Sky Smart. Choose your size and pay with EcoCash, bank transfer or cash.">
+<title>Track Your Order | Sky Smart</title>
+<meta name="description" content="Check the status of your Sky Smart order with your order number.">
 <meta name="theme-color" content="#0f1f4b">
-<meta property="og:title" content="Shop Sneakers & Footwear | Sky Smart">
-<meta property="og:description" content="Browse Jordans, Nike, Adidas and lifestyle sneakers at Sky Smart. Choose your size and pay with EcoCash, bank transfer or cash.">
+<meta property="og:title" content="Track Your Order | Sky Smart">
+<meta property="og:description" content="Check the status of your Sky Smart order with your order number.">
 <meta property="og:image" content="images/about-crest.jpg">
 <link rel="icon" type="image/png" href="images/crest-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,50 +50,31 @@
     </div>
 </header>
 <main id="main">
-<section class="page-hero">
+<section class="page-hero" style="padding:44px 0 40px">
     <div class="wrap">
-        <div class="breadcrumb"><a href="index.html">Home</a> / Shop</div>
-        <h1>Shop sneakers &amp; footwear</h1>
-        <p>Quality pairs at fair prices. Choose your size, add to your bag, and pay with EcoCash, bank transfer or cash.</p>
+        <div class="breadcrumb"><a href="index.html">Home</a> / Track order</div>
+        <h1>Track your order</h1>
+        <p>Enter your order number and the phone number you used at checkout.</p>
     </div>
 </section>
 
-<section class="section" style="padding-top:44px">
-    <div class="wrap">
-        <div class="shop-toolbar" id="shop-toolbar">
-            <div class="chips" role="group" aria-label="Categories"></div>
-            <div class="toolbar-right">
-                <label class="search-field">
-                    <span class="visually-hidden">Search products</span>
-                    <ion-icon name="search-outline"></ion-icon>
-                    <input type="search" data-search placeholder="Search products">
-                </label>
-                <label>
-                    <span class="visually-hidden">Sort by</span>
-                    <select class="select" data-sort>
-                        <option value="featured">Sort: Featured</option>
-                        <option value="price-asc">Price: low to high</option>
-                        <option value="price-desc">Price: high to low</option>
-                        <option value="name">Name: A to Z</option>
-                    </select>
-                </label>
+<div class="wrap" style="max-width:760px;padding-top:40px;padding-bottom:88px">
+    <form class="card" id="track-form" novalidate>
+        <div class="field-row">
+            <div class="field">
+                <label for="t-code">Order number</label>
+                <input id="t-code" name="code" placeholder="SS-7K2QX9" autocomplete="off" autocapitalize="characters" maxlength="9" required>
+            </div>
+            <div class="field">
+                <label for="t-phone">Phone number</label>
+                <input id="t-phone" name="phone" type="tel" inputmode="tel" placeholder="e.g. 077 123 4567" maxlength="30" required>
             </div>
         </div>
-        <p class="result-count" id="result-count" aria-live="polite"></p>
-        <div class="product-grid" data-product-grid data-toolbar="#shop-toolbar" data-count="#result-count"></div>
-
-        <div class="newsletter" style="margin-top:64px">
-            <div>
-                <h2>Looking for something specific?</h2>
-                <p>Tell us the style and size you want. We source new pairs regularly and will let you know when it's in.</p>
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
-                <a class="btn btn-wa" href="https://wa.me/263777076575?text=Hi%20Sky%20Smart!%20I'm%20looking%20for%20a%20pair%20that%20isn't%20on%20the%20website." target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon> Request a pair</a>
-                <a class="btn btn-outline" href="designs.html#collection">Sky Smart Collection</a>
-            </div>
-        </div>
-    </div>
-</section>
+        <div class="alert alert-error" id="track-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-block" id="track-btn"><ion-icon name="search-outline"></ion-icon> Find my order</button>
+    </form>
+    <div id="track-result" style="margin-top:22px" aria-live="polite"></div>
+</div>
 </main>
 <footer class="site-footer">
     <div class="wrap">
@@ -157,6 +138,6 @@
 <script src="api-base.js"></script>
 <script src="catalog.js"></script>
 <script src="shop.js"></script>
-
+<script src="track.js"></script>
 </body>
 </html>

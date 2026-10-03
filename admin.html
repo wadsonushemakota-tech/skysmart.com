@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop Sneakers & Footwear | Sky Smart</title>
-<meta name="description" content="Browse Jordans, Nike, Adidas and lifestyle sneakers at Sky Smart. Choose your size and pay with EcoCash, bank transfer or cash.">
+<title>Orders Dashboard | Sky Smart</title>
+<meta name="description" content="Sky Smart orders dashboard.">
 <meta name="theme-color" content="#0f1f4b">
-<meta property="og:title" content="Shop Sneakers & Footwear | Sky Smart">
-<meta property="og:description" content="Browse Jordans, Nike, Adidas and lifestyle sneakers at Sky Smart. Choose your size and pay with EcoCash, bank transfer or cash.">
+<meta property="og:title" content="Orders Dashboard | Sky Smart">
+<meta property="og:description" content="Sky Smart orders dashboard.">
 <meta property="og:image" content="images/about-crest.jpg">
 <link rel="icon" type="image/png" href="images/crest-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 
+<meta name="robots" content="noindex, nofollow">
 </head>
 <body>
 <a class="visually-hidden" href="#main">Skip to content</a>
@@ -50,50 +51,51 @@
     </div>
 </header>
 <main id="main">
-<section class="page-hero">
+<section class="page-hero" style="padding:36px 0 32px">
     <div class="wrap">
-        <div class="breadcrumb"><a href="index.html">Home</a> / Shop</div>
-        <h1>Shop sneakers &amp; footwear</h1>
-        <p>Quality pairs at fair prices. Choose your size, add to your bag, and pay with EcoCash, bank transfer or cash.</p>
+        <h1 style="font-size:2.2rem">Orders dashboard</h1>
+        <p>Private page for Sky Smart staff.</p>
     </div>
 </section>
 
-<section class="section" style="padding-top:44px">
-    <div class="wrap">
-        <div class="shop-toolbar" id="shop-toolbar">
-            <div class="chips" role="group" aria-label="Categories"></div>
-            <div class="toolbar-right">
-                <label class="search-field">
-                    <span class="visually-hidden">Search products</span>
-                    <ion-icon name="search-outline"></ion-icon>
-                    <input type="search" data-search placeholder="Search products">
-                </label>
-                <label>
-                    <span class="visually-hidden">Sort by</span>
-                    <select class="select" data-sort>
-                        <option value="featured">Sort: Featured</option>
-                        <option value="price-asc">Price: low to high</option>
-                        <option value="price-desc">Price: high to low</option>
-                        <option value="name">Name: A to Z</option>
-                    </select>
-                </label>
-            </div>
+<div class="wrap" style="padding-top:32px;padding-bottom:88px">
+    <form class="card" id="admin-login" style="max-width:460px;margin:0 auto" novalidate>
+        <h2><ion-icon name="lock-closed-outline"></ion-icon> Sign in</h2>
+        <div class="field">
+            <label for="admin-key">Admin key</label>
+            <input id="admin-key" type="password" autocomplete="current-password" required>
         </div>
-        <p class="result-count" id="result-count" aria-live="polite"></p>
-        <div class="product-grid" data-product-grid data-toolbar="#shop-toolbar" data-count="#result-count"></div>
+        <div class="alert alert-error" id="login-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-block">Open dashboard</button>
+    </form>
 
-        <div class="newsletter" style="margin-top:64px">
-            <div>
-                <h2>Looking for something specific?</h2>
-                <p>Tell us the style and size you want. We source new pairs regularly and will let you know when it's in.</p>
+    <div id="dashboard" hidden>
+        <div class="stat-row">
+            <div class="stat"><span>Awaiting payment</span><strong id="stat-pending">0</strong></div>
+            <div class="stat"><span>Paid, to prepare</span><strong id="stat-paid">0</strong></div>
+            <div class="stat"><span>Ready / on the way</span><strong id="stat-out">0</strong></div>
+            <div class="stat"><span>Paid sales (all time)</span><strong id="stat-revenue">$0</strong></div>
+        </div>
+        <div class="admin-bar">
+            <div class="chips" id="status-filter">
+                <button type="button" class="chip active" data-status="">All</button>
+                <button type="button" class="chip" data-status="pending_payment">Awaiting payment</button>
+                <button type="button" class="chip" data-status="paid">Paid</button>
+                <button type="button" class="chip" data-status="ready">Ready</button>
+                <button type="button" class="chip" data-status="shipped">On the way</button>
+                <button type="button" class="chip" data-status="completed">Completed</button>
+                <button type="button" class="chip" data-status="cancelled">Cancelled</button>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
-                <a class="btn btn-wa" href="https://wa.me/263777076575?text=Hi%20Sky%20Smart!%20I'm%20looking%20for%20a%20pair%20that%20isn't%20on%20the%20website." target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon> Request a pair</a>
-                <a class="btn btn-outline" href="designs.html#collection">Sky Smart Collection</a>
+            <div style="display:flex;gap:8px;align-items:center">
+                <span class="field-hint" id="refreshed"></span>
+                <button type="button" class="btn btn-outline btn-sm" id="refresh"><ion-icon name="refresh"></ion-icon> Refresh</button>
+                <button type="button" class="btn btn-outline btn-sm" id="logout">Sign out</button>
             </div>
         </div>
+        <div class="alert alert-error" id="dash-error" role="alert" hidden></div>
+        <div class="orders-list" id="orders"></div>
     </div>
-</section>
+</div>
 </main>
 <footer class="site-footer">
     <div class="wrap">
@@ -157,6 +159,6 @@
 <script src="api-base.js"></script>
 <script src="catalog.js"></script>
 <script src="shop.js"></script>
-
+<script src="admin.js"></script>
 </body>
 </html>

@@ -160,3 +160,26 @@ git push origin main
 | `Docker pipe` error | Start **Docker Desktop**, then `docker compose up -d` |
 | Chat works locally but not on Vercel | Set `PUBLIC_API_URL` on Vercel + `CORS_ORIGIN` on Railway |
 | Home page shows React app only | Ensure `vercel.json` only rewrites `/store`, not `/` |
+
+---
+
+## 6. Running the shop
+
+### Orders dashboard
+
+- Open `/admin.html` on the live site and sign in with the **`ADMIN_KEY`** set on the server (Render → Environment).
+- New orders arrive as **Awaiting payment**. When the EcoCash / bank proof arrives on WhatsApp, press **Mark paid**,
+  then **Mark ready** (collection) or **Mark on the way** (delivery), then **Mark completed**.
+- **Message customer** opens WhatsApp with a ready-written message for the order's current status.
+- Customers follow their order at `/track.html` with their order number + phone number.
+
+### Adding or changing products
+
+Products and prices live in **`catalog.js`** (used by the website *and* the server, so prices can't be tampered with):
+
+1. Put the photo in `images/shop/` (square-ish, about 800px, JPG).
+2. Copy an entry in `catalog.js`, give it a new unique `id`, name, price, category and image path.
+3. Set `featured: true` to show it on the home page.
+4. Commit and push: Vercel and Render redeploy automatically.
+
+Payment details (EcoCash number, bank accounts) are in the `business` section at the bottom of `catalog.js`.

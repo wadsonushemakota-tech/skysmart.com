@@ -61,6 +61,30 @@ async function ensureSchema(client) {
         ALTER TABLE messages ADD COLUMN IF NOT EXISTS reactions JSONB DEFAULT '{}'::jsonb;
         ALTER TABLE messages ADD COLUMN IF NOT EXISTS seen BOOLEAN DEFAULT FALSE;
     `);
+
+    // Shop orders. Prices in items/subtotal come from catalog.js on the server, never the browser.
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS orders (
+            id SERIAL PRIMARY KEY,
+            code TEXT UNIQUE NOT NULL,
+            customer_name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT,
+            delivery_method TEXT NOT NULL,
+            address TEXT,
+            city TEXT,
+            payment_method TEXT NOT NULL,
+            notes TEXT,
+            items JSONB NOT NULL,
+            subtotal NUMERIC(10, 2) NOT NULL,
+            currency TEXT NOT NULL DEFAULT 'USD',
+            status TEXT NOT NULL DEFAULT 'pending_payment',
+            admin_note TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders (created_at DESC);
+    `);
 }
 
 module.exports = { ensureSchema };
