@@ -340,7 +340,7 @@
         $('.sizes', qv).innerHTML = p.sizes.map((s) => `<button type="button" class="size-btn" data-size="${escapeHtml(s)}" aria-pressed="false">${escapeHtml(s)}</button>`).join('');
         $('.size-hint', qv).textContent = '';
         $('.qty output', qv).textContent = '1';
-        $('[data-qv-wa]', qv).href = waLink(`Hi Sky Smart! I'm interested in the ${p.name} (${money(p.price)}). Is it available in my size?`);
+        $('[data-qv-wa]', qv).href = waLink(`Hi Wadson! I'm interested in the ${p.name} (${money(p.price)}). Is it available in my size?`);
         if (typeof qv.showModal === 'function') qv.showModal();
         else qv.setAttribute('open', '');
     }
@@ -393,7 +393,7 @@
                     ? list.map(productCard).join('')
                     : `<div class="empty-state"><ion-icon name="search-outline"></ion-icon>
                         <p>No products match${state.q ? ` “${escapeHtml(state.q)}”` : ''}.</p>
-                        <a class="btn btn-outline btn-sm" href="${waLink(`Hi Sky Smart! I'm looking for ${state.q || 'a pair of shoes'}. Do you have it?`)}" target="_blank" rel="noopener">Ask us on WhatsApp</a></div>`;
+                        <a class="btn btn-outline btn-sm" href="${waLink(`Hi Wadson! I'm looking for ${state.q || 'a pair of shoes'}. Do you have it?`)}" target="_blank" rel="noopener">Ask us on WhatsApp</a></div>`;
                 if (countEl) countEl.textContent = `${list.length} ${list.length === 1 ? 'product' : 'products'}`;
             }
 

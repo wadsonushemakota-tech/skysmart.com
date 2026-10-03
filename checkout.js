@@ -59,7 +59,7 @@
     function orderText(data, code) {
         const lines = bag.items().map(({ product, size, qty }) => `• ${product.name}, size ${size} x${qty}: ${money(product.price * qty)}`);
         return [
-            code ? `Hi Sky Smart! I've placed order ${code}.` : 'Hi Sky Smart! I would like to order:',
+            code ? `Hi Wadson! I've placed order ${code}.` : 'Hi Wadson! I would like to order:',
             ...lines,
             `Total: ${money(bag.subtotal())}${data.delivery.method === 'delivery' ? ' + delivery' : ''}`,
             data.customer.name ? `Name: ${data.customer.name}` : '',
@@ -216,8 +216,8 @@
     function showConfirmation(order, data) {
         const first = (order.customerName || '').split(' ')[0];
         const proofText = order.paymentMethod === 'cash'
-            ? `Hi Sky Smart! I've placed order ${order.code} (${money(order.subtotal)}) and will pay cash on ${data.delivery.method === 'delivery' ? 'delivery' : 'collection'}.`
-            : `Hi Sky Smart! I've placed order ${order.code} (${money(order.subtotal)}). Here is my proof of payment:`;
+            ? `Hi Wadson! I've placed order ${order.code} (${money(order.subtotal)}) and will pay cash on ${data.delivery.method === 'delivery' ? 'delivery' : 'collection'}.`
+            : `Hi Wadson! I've placed order ${order.code} (${money(order.subtotal)}). Here is my proof of payment:`;
         const trackHref = `track.html?code=${encodeURIComponent(order.code)}&phone=${encodeURIComponent(data.customer.phone)}`;
         const el = $('#confirmation');
         el.innerHTML = `

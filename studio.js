@@ -131,7 +131,7 @@
                 `Name: ${name}`,
                 f.phone.value.trim() ? `Phone: ${f.phone.value.trim()}` : '',
             ].filter(Boolean);
-            const text = [`Hi Sky Smart! ${g.intro}: ${f.service.value}`, description, details.join('\n')].join('\n\n');
+            const text = [`Hi Wadson! ${g.intro}: ${f.service.value}`, description, details.join('\n')].join('\n\n');
             const via = (e.submitter && e.submitter.dataset.via) || 'whatsapp';
             if (via === 'email') {
                 window.location.href = `mailto:${biz.email}?subject=${encodeURIComponent(`${g.label} request: ${f.service.value}`)}&body=${encodeURIComponent(text)}`;

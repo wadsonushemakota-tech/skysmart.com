@@ -52,7 +52,7 @@
                     </div>`).join('')}</div>
                 <div class="summary-row total"><span>Total</span><span>${money(order.subtotal)}${order.deliveryMethod === 'delivery' ? ' + delivery' : ''}</span></div>
                 <a class="btn btn-wa btn-block" style="margin-top:14px" target="_blank" rel="noopener"
-                   href="${waLink(`Hi Sky Smart! I'm asking about my order ${order.code}.`)}"><ion-icon name="logo-whatsapp"></ion-icon> Ask about this order</a>
+                   href="${waLink(`Hi Wadson! I'm asking about my order ${order.code}.`)}"><ion-icon name="logo-whatsapp"></ion-icon> Ask about this order</a>
             </div>`;
     }
 
