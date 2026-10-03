@@ -821,3 +821,77 @@ a.service:hover .service-cta ion-icon { transform: translateX(4px); }
     .studio-contact { flex-direction: column; align-items: stretch; text-align: center; }
     .studio-contact-actions .btn { flex: 1 1 100%; }
 }
+
+/* ---------- Sky Smart Digital (websites & apps) ---------- */
+.digital-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.digital-card {
+    display: flex; flex-direction: column; padding: 28px 24px; border-radius: var(--radius-lg); text-decoration: none;
+    background: rgba(255, 255, 255, .06); border: 1px solid rgba(212, 173, 85, .28); color: #c9d2ea;
+    transition: transform .25s ease, background .25s ease, border-color .25s ease;
+}
+.digital-card:hover { transform: translateY(-6px); background: rgba(255, 255, 255, .11); border-color: var(--gold); }
+.digital-card h3 { color: #fff; font-family: var(--font-sans); font-size: 1.15rem; margin: 16px 0 6px; }
+.digital-card p { margin: 0; font-size: 15px; flex: 1; }
+.digital-card .service-cta { color: var(--gold); }
+.digital-card:hover .service-cta ion-icon { transform: translateX(4px); }
+.digital-icon {
+    width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f1d58c, var(--gold)); color: var(--navy-deep);
+}
+.digital-icon ion-icon { font-size: 26px; }
+.digital-foot {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 28px;
+    padding: 20px 24px; border-radius: var(--radius-lg); background: rgba(255, 255, 255, .05); border: 1px dashed rgba(212, 173, 85, .4);
+}
+.digital-foot p { margin: 0; display: flex; align-items: center; gap: 10px; color: #e8ecf6; }
+.digital-foot p ion-icon { color: var(--gold); font-size: 22px; }
+.digital-foot-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- Sponsor ---------- */
+.sponsor {
+    display: grid; grid-template-columns: 1fr 1.25fr; gap: 40px; align-items: center; padding: 44px;
+    border-radius: 28px; border: 1px solid #ecd9a6;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(212, 173, 85, .25), transparent 45%),
+        linear-gradient(135deg, #fff9ea, #fff);
+    box-shadow: var(--shadow);
+}
+.sponsor-intro img { width: 72px; height: auto; margin-bottom: 14px; }
+.sponsor-intro h2 { font-size: clamp(2rem, 4vw, 2.6rem); margin: 0 0 12px; }
+.sponsor-intro p { color: var(--muted); margin: 0 0 24px; font-size: 16.5px; }
+.sponsor-ways { display: grid; gap: 14px; }
+.sponsor-way {
+    display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; border-radius: 18px; background: #fff;
+    border: 1px solid var(--line); text-decoration: none; color: var(--muted); font-size: 14.5px;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+a.sponsor-way:hover { border-color: var(--gold); transform: translateX(4px); box-shadow: var(--shadow-sm); }
+.sponsor-way strong { display: block; color: var(--navy); font-size: 1.02rem; margin-bottom: 2px; }
+.sponsor-way b { color: var(--navy); }
+.sponsor-way .pay-detail { margin: 12px 0 10px; font-size: 14px; padding: 12px 14px; }
+.sponsor-give-body { flex: 1; min-width: 0; }
+.sponsor-thanks { display: inline-flex; align-items: center; gap: 6px; color: #128c4a; font-weight: 700; text-decoration: none; }
+.sponsor-thanks:hover { text-decoration: underline; }
+
+@media (max-width: 1024px) {
+    .digital-grid { grid-template-columns: repeat(2, 1fr); }
+    .sponsor { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+    .digital-grid { grid-template-columns: 1fr; }
+    .digital-foot { flex-direction: column; align-items: stretch; }
+    .digital-foot-actions .btn { flex: 1 1 100%; }
+    .sponsor { padding: 26px 18px; }
+    .sponsor-way { padding: 16px; }
+    .sponsor-intro .btn { width: 100%; }
+}
+
+/* Sponsor payment details must wrap inside narrow cards */
+.sponsor-way .pay-detail { grid-template-columns: auto minmax(0, 1fr) auto; }
+.sponsor-way .pay-detail dd { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+    .sponsor-way .pay-detail { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@media (max-width: 600px) {
+    .sponsor-give { flex-direction: column; gap: 12px; }
+}
