@@ -197,3 +197,14 @@ payment) the moment an order is placed. It uses the free **CallMeBot** service:
 3. The WhatsApp number that receives alerts is `business.whatsapp` in `catalog.js` (override with `OWNER_WHATSAPP`).
 
 Without the key, ordering still works; you then see orders in `/admin.html` and in the customer's WhatsApp message.
+
+### Email alert for every new order (recommended)
+
+1. Sign up at https://resend.com with the **owner's Gmail** (wadsonushemakota@gmail.com).
+2. **API Keys → Create API key** (permission: *Sending access*), copy it (`re_...`).
+3. On Render → `sky-smart-api` → Environment, set `RESEND_API_KEY` to it.
+
+Each order then arrives as an email with items, sizes, customer phone, delivery and payment, plus
+"WhatsApp the customer" and "Open orders dashboard" buttons. (Render's free plan blocks Gmail SMTP,
+which is why this uses Resend's API.) Without a verified domain, Resend can only deliver to the
+account's own email, which is exactly the owner's inbox here.

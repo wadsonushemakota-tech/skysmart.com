@@ -826,8 +826,14 @@ function validateOrder(body) {
     };
 }
 
-// WhatsApp alert to the owner for each new order, via CallMeBot (https://www.callmebot.com).
-// Needs CALLMEBOT_APIKEY, which the owner gets once by messaging CallMeBot from their WhatsApp.
+// ---- New-order alerts to the owner ----
+// Email via Resend (RESEND_API_KEY) and/or WhatsApp via CallMeBot (CALLMEBOT_APIKEY); each is optional.
+// Render's free plan blocks SMTP ports, so email goes through Resend's HTTPS API instead of Gmail SMTP.
+const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
+const RESEND_URL = process.env.RESEND_URL || 'https://api.resend.com/emails';
+const OWNER_EMAIL = (process.env.OWNER_EMAIL || catalog.business.email).trim();
+// Resend's shared test sender can only deliver to the Resend account's own address, which is the owner here
+const ALERT_FROM = process.env.ALERT_FROM || 'Sky Smart Orders <onboarding@resend.dev>';
 const OWNER_WHATSAPP = (process.env.OWNER_WHATSAPP || catalog.business.whatsapp).replace(/\D/g, '');
 const CALLMEBOT_APIKEY = (process.env.CALLMEBOT_APIKEY || '').trim();
 const CALLMEBOT_URL = process.env.CALLMEBOT_URL || 'https://api.callmebot.com/whatsapp.php';
@@ -856,7 +862,75 @@ function orderAlertText(row) {
     ].filter((l) => l !== null).join('\n');
 }
 
-async function notifyOwnerOfOrder(row) {
+function escapeHtmlText(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function orderAlertHtml(row) {
+    const money = (n) => '$' + Number(n).toFixed(2).replace(/\.00$/, '');
+    const isDelivery = row.delivery_method === 'delivery';
+    const payment = { ecocash: 'EcoCash', bank: 'Bank transfer', cash: 'Cash' }[row.payment_method] || row.payment_method;
+    let wa = String(row.phone || '').replace(/\D/g, '');
+    if (wa.startsWith('0')) wa = '263' + wa.slice(1);
+    const waText = encodeURIComponent(`Hi ${String(row.customer_name).split(' ')[0]}, this is Sky Smart. Thank you for your order ${row.code}!`);
+    const cell = 'padding:8px 0;border-bottom:1px solid #eee;';
+    const rows = row.items.map((i) => `<tr><td style="${cell}">${i.qty} × ${escapeHtmlText(i.name)} <span style="color:#667">(size ${escapeHtmlText(i.size)})</span></td>` +
+        `<td style="${cell}text-align:right;font-weight:700">${money(i.price * i.qty)}</td></tr>`).join('');
+    const line = (label, value) => `<tr><td style="padding:4px 12px 4px 0;color:#667;white-space:nowrap">${label}</td><td style="padding:4px 0;font-weight:600">${value}</td></tr>`;
+    return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:auto;color:#1f2937">
+  <div style="background:#0f1f4b;color:#fff;padding:20px 24px;border-radius:14px 14px 0 0;border-bottom:3px solid #d4ad55">
+    <div style="color:#f3e3b8;font-size:12px;letter-spacing:2px;text-transform:uppercase">New order</div>
+    <div style="font-size:24px;font-weight:800;margin-top:4px">${escapeHtmlText(row.code)} · ${money(row.subtotal)}${isDelivery ? ' + delivery' : ''}</div>
+  </div>
+  <div style="border:1px solid #e6e8ee;border-top:none;padding:20px 24px;border-radius:0 0 14px 14px">
+    <table style="border-collapse:collapse;font-size:15px">
+      ${line('Customer', escapeHtmlText(row.customer_name))}
+      ${line('Phone', `<a href="tel:${escapeHtmlText(row.phone)}">${escapeHtmlText(row.phone)}</a>`)}
+      ${row.email ? line('Email', escapeHtmlText(row.email)) : ''}
+      ${line(isDelivery ? 'Deliver to' : 'Delivery', isDelivery ? escapeHtmlText([row.address, row.city].filter(Boolean).join(', ')) + ' <span style="color:#9a5b00">(fee to confirm)</span>' : 'Collection in Bulawayo')}
+      ${line('Payment', escapeHtmlText(payment))}
+    </table>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;margin-top:16px">${rows}
+      <tr><td style="padding:10px 0;font-weight:800">Total</td><td style="padding:10px 0;text-align:right;font-weight:800;color:#0f1f4b">${money(row.subtotal)}${isDelivery ? ' + delivery' : ''}</td></tr>
+    </table>
+    ${row.notes ? `<p style="background:#fff8e6;border:1px solid #f0d9a0;padding:10px 12px;border-radius:10px">Note: ${escapeHtmlText(row.notes)}</p>` : ''}
+    <p style="margin-top:20px">
+      <a href="https://wa.me/${wa}?text=${waText}" style="background:#25d366;color:#fff;padding:11px 18px;border-radius:999px;text-decoration:none;font-weight:700;display:inline-block;margin:0 8px 8px 0">WhatsApp the customer</a>
+      ${SITE_URL ? `<a href="${SITE_URL}/admin.html" style="background:#0f1f4b;color:#fff;padding:11px 18px;border-radius:999px;text-decoration:none;font-weight:700;display:inline-block">Open orders dashboard</a>` : ''}
+    </p>
+  </div>
+</div>`;
+}
+
+async function sendEmailAlert(row) {
+    if (!RESEND_API_KEY || !OWNER_EMAIL) return;
+    try {
+        const res = await fetch(RESEND_URL, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                from: ALERT_FROM,
+                to: [OWNER_EMAIL],
+                subject: `🛍️ New order ${row.code}: $${Number(row.subtotal)} from ${row.customer_name}`,
+                html: orderAlertHtml(row),
+                text: orderAlertText(row),
+            }),
+            signal: AbortSignal.timeout(20000),
+        });
+        const body = await res.text();
+        if (!res.ok) console.error(`Email order alert for ${row.code} failed: HTTP ${res.status} ${body.slice(0, 300)}`);
+        else console.log(`📧 Email alert sent for ${row.code} to ${OWNER_EMAIL}`);
+    } catch (err) {
+        console.error(`Email order alert for ${row.code} failed:`, err.message);
+    }
+}
+
+function notifyOwnerOfOrder(row) {
+    sendEmailAlert(row);
+    sendWhatsAppAlert(row);
+}
+
+async function sendWhatsAppAlert(row) {
     if (!CALLMEBOT_APIKEY || !OWNER_WHATSAPP) return;
     const url = `${CALLMEBOT_URL}?phone=%2B${OWNER_WHATSAPP}` +
         `&text=${encodeURIComponent(orderAlertText(row))}&apikey=${encodeURIComponent(CALLMEBOT_APIKEY)}`;
@@ -1035,4 +1109,6 @@ server.listen(PORT, () => {
         console.log(`💳 Stripe Checkout disabled — set STRIPE_SECRET_KEY in .env to accept card payments`);
     }
     console.log(`💬 Real-time chat active!`);
+    console.log(`🔔 Order alerts: email ${RESEND_API_KEY ? 'ON → ' + OWNER_EMAIL : 'off (set RESEND_API_KEY)'}, ` +
+        `WhatsApp ${CALLMEBOT_APIKEY ? 'ON → +' + OWNER_WHATSAPP : 'off (set CALLMEBOT_APIKEY)'}`);
 });
