@@ -249,12 +249,20 @@
             <p>From logos and brand identity to printed T-shirts for your team. Tell us your idea and we'll design it with you.</p>
         </div>
         <div class="services">
-            <div class="service reveal"><span class="service-icon"><ion-icon name="shirt-outline"></ion-icon></span><h3>T-shirt printing</h3><p>Sharp, durable prints for teams, churches, businesses and events.</p></div>
-            <div class="service reveal"><span class="service-icon"><ion-icon name="color-palette-outline"></ion-icon></span><h3>Logo design</h3><p>Memorable logos with strong typography and simple geometry.</p></div>
-            <div class="service reveal"><span class="service-icon"><ion-icon name="diamond-outline"></ion-icon></span><h3>Brand identity</h3><p>Colours, fonts and brand systems that feel premium and consistent.</p></div>
-            <div class="service reveal"><span class="service-icon"><ion-icon name="phone-portrait-outline"></ion-icon></span><h3>Social media</h3><p>Posts, banners and promo designs that stop the scroll.</p></div>
-            <div class="service reveal"><span class="service-icon"><ion-icon name="megaphone-outline"></ion-icon></span><h3>Posters &amp; flyers</h3><p>Event posters and flyers with clear hierarchy and bold style.</p></div>
-            <div class="service reveal"><span class="service-icon"><ion-icon name="cube-outline"></ion-icon></span><h3>Packaging</h3><p>Clean packaging layouts that lift how your product is seen.</p></div>
+            <a class="service reveal" href="#request" data-service="T-shirt printing"><span class="service-icon"><ion-icon name="shirt-outline"></ion-icon></span><h3>T-shirt printing</h3><p>Sharp, durable prints for teams, churches, businesses and events.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+            <a class="service reveal" href="#request" data-service="Logo design"><span class="service-icon"><ion-icon name="color-palette-outline"></ion-icon></span><h3>Logo design</h3><p>Memorable logos with strong typography and simple geometry.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+            <a class="service reveal" href="#request" data-service="Brand identity"><span class="service-icon"><ion-icon name="diamond-outline"></ion-icon></span><h3>Brand identity</h3><p>Colours, fonts and brand systems that feel premium and consistent.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+            <a class="service reveal" href="#request" data-service="Social media"><span class="service-icon"><ion-icon name="phone-portrait-outline"></ion-icon></span><h3>Social media</h3><p>Posts, banners and promo designs that stop the scroll.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+            <a class="service reveal" href="#request" data-service="Posters & flyers"><span class="service-icon"><ion-icon name="megaphone-outline"></ion-icon></span><h3>Posters &amp; flyers</h3><p>Event posters and flyers with clear hierarchy and bold style.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+            <a class="service reveal" href="#request" data-service="Packaging"><span class="service-icon"><ion-icon name="cube-outline"></ion-icon></span><h3>Packaging</h3><p>Clean packaging layouts that lift how your product is seen.</p><span class="service-cta">Request this service <ion-icon name="arrow-forward"></ion-icon></span></a>
+        </div>
+        <div class="studio-contact reveal">
+            <div><strong>Prefer to talk it through?</strong><span>Call or message us. We reply fastest on WhatsApp.</span></div>
+            <div class="studio-contact-actions">
+                <a class="btn btn-primary btn-sm" href="tel:+263777076575"><ion-icon name="call-outline"></ion-icon> Call +263 77 707 6575</a>
+                <a class="btn btn-wa btn-sm" href="https://wa.me/263777076575" target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon> WhatsApp</a>
+                <a class="btn btn-outline btn-sm" href="mailto:wadsonushemakota@gmail.com"><ion-icon name="mail-outline"></ion-icon> Email</a>
+            </div>
         </div>
         <div class="center-cta"><a href="designs.html" class="btn btn-primary">Visit the Design Studio <ion-icon name="arrow-forward"></ion-icon></a></div>
     </div>
@@ -303,14 +311,17 @@
 <!-- Community Hub — WhatsApp-style live chat -->
 <section id="community" class="community wa-community">
     <div class="community-container">
-        <h2 class="section-title wa-section-title">Community chat</h2>
-        <p class="community-intro">Real-time messages and photos — stay respectful and have fun.</p>
+        <div class="section-head">
+            <span class="eyebrow">Join the conversation</span>
+            <h2 class="section-title wa-section-title">Sky Smart community chat</h2>
+            <p class="community-intro">Ask about sizes, share your fits and chat with other customers in real time. Stay respectful and have fun.</p>
+        </div>
 
         <div class="chat-room wa-chat-room" role="region" aria-label="Sky Smart community chat">
             <header class="wa-chat-header">
                 <div class="wa-chat-header-main">
                     <div class="wa-chat-avatar" aria-hidden="true">
-                        <ion-icon name="people"></ion-icon>
+                        <img src="images/crest-mark.png" alt="" width="30" height="26">
                     </div>
                     <div class="wa-chat-header-text">
                         <h3 class="wa-chat-title">Sky Smart Community</h3>
@@ -556,6 +567,7 @@
 <script src="api-base.js"></script>
 <script src="catalog.js"></script>
 <script src="shop.js"></script>
+<script src="studio.js"></script>
 <script>
 // About slideshow and contact form
 (function () {
