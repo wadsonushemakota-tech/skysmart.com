@@ -26,3 +26,6 @@ Thumbs.db
 # Optional local tooling
 .idea/
 .vscode/
+
+# Vercel CLI link
+.vercel/

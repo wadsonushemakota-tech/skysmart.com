@@ -42,7 +42,7 @@ const pool = new Pool({ connectionString: url, ssl: sslConfig() });
             console.error('Supabase tips:');
             console.error('  1. Supabase → Project Settings → Database → URI');
             console.error('  2. Replace [YOUR-PASSWORD] with your database password');
-            console.error('  3. Use direct connection (port 5432) for this Node server');
+            console.error('  3. Use the Session pooler URI (pooler.supabase.com, port 5432); the direct host is IPv6-only');
         }
         process.exit(1);
     } finally {

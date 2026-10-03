@@ -35,18 +35,41 @@ Production layout:
 
 ### Option B — Supabase (production)
 
-1. [Supabase](https://supabase.com/) → New project.
-2. **Project Settings → Database → Connection string → URI** (direct, port **5432**).
-3. Replace `[YOUR-PASSWORD]` with your database password.
-4. Set on **Railway** (not in GitHub):
+Supabase gives you the hosted PostgreSQL database **and** file storage for chat photos/voice notes
+(Railway's own disk is wiped on every redeploy, so uploads must live elsewhere).
+
+1. [Supabase](https://supabase.com/) → **New project**. Pick the region closest to your customers and save the database password.
+2. **Connect** (top bar) → **Session pooler** → copy the URI. It looks like:
 
    ```env
    DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
    ```
 
-   Or use the **Session/Direct** URI from the dashboard if shown.
+   Use the **Session pooler**, not "Direct connection": the direct host is IPv6-only and Railway cannot reach it.
+   Replace `[YOUR-PASSWORD]` with your database password (URL-encode special characters like `@` or `#`).
+3. **Project Settings → API**: copy the **Project URL** and the **service_role** secret key:
 
-5. Test locally (optional): paste URI into `.env`, then `node scripts/test-db.js`.
+   ```env
+   SUPABASE_URL=https://[ref].supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=eyJ...   # secret: server only, never in the frontend or GitHub
+   ```
+
+   The server creates a public `chat-media` bucket on first start.
+4. Test from your machine: put these three values in `.env`, then
+
+   ```bash
+   node scripts/test-db.js
+   ```
+
+5. Copy your local data (users, products, chat history, and chat photos/voice notes) into Supabase.
+   Docker Desktop must be running so the local database is reachable:
+
+   ```bash
+   node scripts/copy-db.js
+   ```
+
+   It copies from the local Docker DB to `DATABASE_URL`, and is safe to re-run (existing rows are skipped).
+6. Set the same `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` on **Railway** (next section).
 
 ### JWT secret
 
@@ -70,7 +93,9 @@ node scripts/generate-secrets.js
    |----------|---------|
    | `NODE_ENV` | `production` |
    | `API_ONLY` | `1` |
-   | `DATABASE_URL` | Supabase URI |
+   | `DATABASE_URL` | Supabase Session pooler URI |
+   | `SUPABASE_URL` | `https://[ref].supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key |
    | `JWT_SECRET` | from `generate-secrets.js` |
    | `CORS_ORIGIN` | `https://skysmart-com.vercel.app` |
    | `TRUST_PROXY` | `1` |

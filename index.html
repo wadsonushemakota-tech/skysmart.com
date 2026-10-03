@@ -77,7 +77,7 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
                 <div class="form">
                     <h2>The Founder</h2>
                     <div class="founder-photo-wrapper">
-                        <img src="images/ceo.jpg" alt="The Founder" class="founder-photo">
+                        <img src="images/founder-wadson.png" alt="Wadson Ushemakota, Founder of Sky Smart" class="founder-photo">
                         <div class="image-overlay">Click Here</div>
                     </div>
                     <button type="button" class="btnn founder-name" id="founder-btn">Wadson Ushemakota</button>
@@ -562,6 +562,11 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
         justify-content: center;
         flex-wrap: wrap;
         margin-top: 20px;
+    }
+
+    /* products.css caps .products at 1200px (meant for products.html); let the homepage section span full width */
+    #products.products {
+        max-width: none;
     }
 
     .product {
@@ -2643,8 +2648,8 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
                         <h3 class="wa-chat-title">Sky Smart Community</h3>
                         <p class="wa-chat-subtitle">
                             <span class="wa-status-dot" aria-hidden="true"></span>
-                            <span id="chat-online-count">Live</span>
-                            <span class="wa-chat-meta">· end-to-end friendly · public room</span>
+                            <span id="chat-online-count">Connecting…</span>
+                            <span class="wa-chat-meta" id="chat-room-meta">· public room</span>
                         </p>
                     </div>
                 </div>
@@ -2672,8 +2677,13 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
                     </div>
                 </div>
             </div>
+            <button type="button" id="chat-jump-btn" class="wa-jump-btn" aria-label="Jump to latest messages" hidden>
+                <ion-icon name="chevron-down"></ion-icon>
+                <span id="chat-jump-count" class="wa-jump-count" hidden></span>
+            </button>
 
             <div class="chat-input-area wa-chat-input-area">
+                <div id="emoji-picker" class="emoji-picker wa-emoji-picker" role="listbox" aria-label="Emoji" style="display: none;"></div>
                 <div id="reply-preview" class="reply-preview wa-reply-preview" style="display: none;">
                     <div class="reply-info">
                         <span class="reply-user"></span>
@@ -2685,10 +2695,24 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
                     <img id="image-preview" src="" alt="Image to send">
                     <button type="button" id="remove-image-btn" class="remove-image-btn" aria-label="Remove image">&times;</button>
                 </div>
-                <div id="voice-preview-container" class="voice-preview-container wa-voice-preview" style="display: none;"></div>
+                <div id="voice-preview-container" class="voice-preview-container wa-voice-preview" style="display: none;">
+                    <button type="button" id="cancel-voice-btn" class="cancel-voice-btn" aria-label="Discard voice note" title="Discard">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                    <div class="voice-status">
+                        <span class="recording-dot" aria-hidden="true"></span>
+                        <span id="voice-timer">00:00</span>
+                    </div>
+                    <button type="button" id="stop-voice-btn" class="stop-voice-btn" aria-label="Send voice note" title="Send">
+                        <ion-icon name="send"></ion-icon>
+                    </button>
+                </div>
 
                 <div class="wa-composer">
                     <div class="wa-composer-tools">
+                        <button type="button" id="emoji-btn" class="wa-tool-btn wa-tool-emoji" aria-label="Emoji" title="Emoji">
+                            <ion-icon name="happy-outline"></ion-icon>
+                        </button>
                         <input type="file" id="chat-image-input" accept="image/*" class="wa-hidden-input" aria-hidden="true" tabindex="-1">
                         <label for="chat-image-input" class="wa-tool-btn wa-tool-photo" title="Photo">
                             <ion-icon name="images-outline"></ion-icon>
@@ -2698,7 +2722,10 @@ We bring you the latest trends in shoes and clothing. Whether you are looking fo
                     <div class="wa-composer-field">
                         <input type="text" id="chat-message-input" class="wa-message-input" placeholder="Message" maxlength="2000" autocomplete="off" enterkeyhint="send">
                     </div>
-                    <button type="button" id="chat-send-btn" class="wa-send-btn" aria-label="Send message" title="Send">
+                    <button type="button" id="mic-btn" class="wa-send-btn wa-mic-btn" aria-label="Record voice note" title="Voice note">
+                        <ion-icon name="mic"></ion-icon>
+                    </button>
+                    <button type="button" id="chat-send-btn" class="wa-send-btn" aria-label="Send message" title="Send" hidden>
                         <ion-icon name="send"></ion-icon>
                     </button>
                 </div>

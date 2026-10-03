@@ -9,7 +9,9 @@ const http = require('http');
 const { Server } = require('socket.io');
 const multer = require('multer');
 const fs = require('fs');
+const crypto = require('crypto');
 const { Pool } = require('pg');
+const { ensureSchema } = require('./db-schema');
 
 const stripe = process.env.STRIPE_SECRET_KEY
     ? require('stripe')(process.env.STRIPE_SECRET_KEY)
@@ -79,69 +81,23 @@ const pool = new Pool({
     ssl: databaseSslConfig(),
 });
 
+// Hosted Postgres (e.g. Supabase) can drop idle connections; without this the process crashes
+pool.on('error', (err) => {
+    console.error('Postgres idle client error:', err.message);
+});
+
+// Set once the messages table is ready; until then chat falls back to an in-memory store
+let chatDbReady = false;
+
 // Database Initialization
 const initDb = async () => {
     let client;
     try {
         client = await pool.connect();
         
-        // Create basic tables
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                name TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
+        await ensureSchema(client);
 
-            CREATE TABLE IF NOT EXISTS products (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                price DECIMAL NOT NULL,
-                sizes INTEGER[],
-                colors TEXT[],
-                images TEXT[],
-                description TEXT,
-                category TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                username TEXT NOT NULL,
-                text TEXT,
-                media_url TEXT,
-                media_type TEXT DEFAULT 'text',
-                reply_to_id INTEGER REFERENCES messages(id),
-                reply_to_user TEXT,
-                reply_to_text TEXT,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // Add columns if they don't exist (migration)
-        await client.query(`
-            DO $$ 
-            BEGIN 
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='media_url') THEN
-                    ALTER TABLE messages ADD COLUMN media_url TEXT;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='media_type') THEN
-                    ALTER TABLE messages ADD COLUMN media_type TEXT DEFAULT 'text';
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='reply_to_id') THEN
-                    ALTER TABLE messages ADD COLUMN reply_to_id INTEGER REFERENCES messages(id);
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='reply_to_user') THEN
-                    ALTER TABLE messages ADD COLUMN reply_to_user TEXT;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='reply_to_text') THEN
-                    ALTER TABLE messages ADD COLUMN reply_to_text TEXT;
-                END IF;
-            END $$;
-        `);
-
+        chatDbReady = true;
         console.log('✅ Database tables initialized');
 
         // Check if products exist, if not seed them
@@ -171,6 +127,8 @@ const initDb = async () => {
             '❌ Database connection error. Check DATABASE_URL (e.g. Supabase Project Settings → Database → URI).'
         );
         console.error('Error detail:', err.message);
+        console.error('   Retrying in 30s; chat uses in-memory storage until then.');
+        setTimeout(initDb, 30000);
     } finally {
         if (client) client.release();
     }
@@ -184,22 +142,76 @@ if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer setup for chat media
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+// Chat media goes to Supabase Storage when configured (survives redeploys), otherwise to local disk
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+const SUPABASE_SERVICE_ROLE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+const SUPABASE_BUCKET = (process.env.SUPABASE_BUCKET || 'chat-media').trim();
+const useSupabaseStorage = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY);
+const supabasePublicPrefix = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/`;
+
+function supabaseHeaders(extra) {
+    return { Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`, apikey: SUPABASE_SERVICE_ROLE_KEY, ...extra };
+}
+
+async function ensureSupabaseBucket() {
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
+        method: 'POST',
+        headers: supabaseHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ id: SUPABASE_BUCKET, name: SUPABASE_BUCKET, public: true }),
+    });
+    const body = await res.text();
+    if (!res.ok && !/already exists|Duplicate/i.test(body)) {
+        throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
     }
-});
+}
+
+if (useSupabaseStorage) {
+    ensureSupabaseBucket()
+        .then(() => console.log(`✅ Chat uploads: Supabase Storage bucket "${SUPABASE_BUCKET}"`))
+        .catch((err) => console.error('❌ Supabase Storage bucket setup failed:', err.message));
+}
+
+function chatUploadName(originalname) {
+    const ext = path.extname(originalname || '').replace(/[^.\w]/g, '').slice(0, 8);
+    return Date.now() + '-' + Math.random().toString(36).slice(2, 8) + ext;
+}
+
+// Returns the public URL (Supabase) or site-relative path (disk) for the stored file
+async function storeChatUpload(file) {
+    const name = chatUploadName(file.originalname);
+    if (!useSupabaseStorage) {
+        await fs.promises.writeFile(path.join(uploadDir, name), file.buffer);
+        return `/uploads/chat/${name}`;
+    }
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/chat/${name}`, {
+        method: 'POST',
+        headers: supabaseHeaders({
+            'Content-Type': String(file.mimetype).split(';')[0].trim(),
+            'Cache-Control': 'max-age=31536000',
+        }),
+        body: file.buffer,
+    });
+    if (!res.ok) throw new Error(`Supabase upload failed: HTTP ${res.status} ${(await res.text()).slice(0, 200)}`);
+    return `${supabasePublicPrefix}chat/${name}`;
+}
+
+function isStoredChatMedia(url) {
+    if (/^\/uploads\/chat\/[\w.-]+$/.test(url)) return true;
+    return useSupabaseStorage && url.startsWith(supabasePublicPrefix + 'chat/') &&
+        /^[\w.-]+$/.test(url.slice((supabasePublicPrefix + 'chat/').length));
+}
+
+// Multer setup for chat media (kept in memory, then written by storeChatUpload)
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     const allowedTypes = [
         'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-        'audio/mpeg', 'audio/wav', 'audio/webm', 'audio/ogg'
+        'audio/mpeg', 'audio/wav', 'audio/webm', 'audio/ogg',
+        'audio/mp4', 'audio/x-m4a', 'audio/aac'
     ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // Recorders send e.g. "audio/webm;codecs=opus"
+    if (allowedTypes.includes(String(file.mimetype).split(';')[0].trim())) {
         cb(null, true);
     } else {
         cb(new Error('Invalid file type'), false);
@@ -212,72 +224,277 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Socket.io logic
+// ---- Community chat (Socket.io) ----
+const CHAT_HISTORY_LIMIT = 100;
+const CHAT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+const CHAT_MEDIA_TYPES = ['text', 'image', 'voice'];
+
+// Public, non-reversible id for a browser; the raw clientId authorises deletes so it is never sent out
+function senderTag(clientId) {
+    return crypto.createHash('sha256').update(String(clientId)).digest('hex').slice(0, 16);
+}
+
+function cleanString(value, max) {
+    if (typeof value !== 'string') return null;
+    const s = value.trim().slice(0, max);
+    return s || null;
+}
+
+function sanitizeIncoming(msg) {
+    if (!msg || typeof msg !== 'object') return null;
+    const text = cleanString(msg.text, 2000);
+    const mediaType = CHAT_MEDIA_TYPES.includes(msg.media_type) ? msg.media_type : 'text';
+    let media = cleanString(msg.media, 300);
+    // Only files that came through /api/chat/upload
+    if (mediaType === 'text' || (media && !isStoredChatMedia(media))) media = null;
+    if (mediaType !== 'text' && !media) return null;
+    if (!text && !media) return null;
+    const replyId = Number.isInteger(msg.reply_to_id) && msg.reply_to_id > 0 ? msg.reply_to_id : null;
+    return {
+        user: cleanString(msg.user, 40) || 'Anonymous',
+        text,
+        media,
+        media_type: mediaType,
+        reply_to_id: replyId,
+        reply_to_user: replyId ? cleanString(msg.reply_to_user, 40) : null,
+        reply_to_text: replyId ? cleanString(msg.reply_to_text, 200) : null,
+    };
+}
+
+function publicMessage(row) {
+    const deleted = row.deleted === true;
+    return {
+        id: row.id,
+        user: row.username,
+        sender: row.sender_id ? senderTag(row.sender_id) : null,
+        text: deleted ? null : row.text,
+        media: deleted ? null : row.media_url,
+        media_type: deleted ? 'text' : row.media_type || 'text',
+        reply_to_id: row.reply_to_id,
+        reply_to_user: row.reply_to_user,
+        reply_to_text: row.reply_to_text,
+        deleted,
+        reactions: deleted ? {} : row.reactions || {},
+        seen: row.seen === true,
+        timestamp: row.timestamp,
+    };
+}
+
+// Postgres when available, otherwise an in-memory room (lost on restart) so chat still works
+const memoryChat = { rows: [], nextId: 1 };
+const chatStore = {
+    async recent() {
+        if (!chatDbReady) return memoryChat.rows.slice(-CHAT_HISTORY_LIMIT);
+        const res = await pool.query(
+            'SELECT * FROM (SELECT * FROM messages ORDER BY id DESC LIMIT $1) m ORDER BY id ASC',
+            [CHAT_HISTORY_LIMIT]
+        );
+        return res.rows;
+    },
+
+    async insert(m, clientId) {
+        if (!chatDbReady) {
+            const row = {
+                id: memoryChat.nextId++,
+                username: m.user,
+                sender_id: clientId,
+                text: m.text,
+                media_url: m.media,
+                media_type: m.media_type,
+                reply_to_id: memoryChat.rows.some((r) => r.id === m.reply_to_id) ? m.reply_to_id : null,
+                reply_to_user: m.reply_to_user,
+                reply_to_text: m.reply_to_text,
+                deleted: false,
+                reactions: {},
+                seen: false,
+                timestamp: new Date(),
+            };
+            memoryChat.rows.push(row);
+            if (memoryChat.rows.length > 500) memoryChat.rows.shift();
+            return row;
+        }
+        const res = await pool.query(
+            `INSERT INTO messages (username, sender_id, text, media_url, media_type, reply_to_id, reply_to_user, reply_to_text)
+             VALUES ($1, $2, $3, $4, $5, (SELECT id FROM messages WHERE id = $6), $7, $8)
+             RETURNING *`,
+            [m.user, clientId, m.text, m.media, m.media_type, m.reply_to_id, m.reply_to_user, m.reply_to_text]
+        );
+        return res.rows[0];
+    },
+
+    async remove(id, clientId) {
+        if (!chatDbReady) {
+            const row = memoryChat.rows.find((r) => r.id === id && r.sender_id === clientId && !r.deleted);
+            if (!row) return null;
+            Object.assign(row, { deleted: true, text: null, media_url: null, reactions: {} });
+            return row;
+        }
+        const res = await pool.query(
+            `UPDATE messages SET deleted = TRUE, text = NULL, media_url = NULL, reactions = '{}'::jsonb
+             WHERE id = $1 AND sender_id = $2 AND deleted IS NOT TRUE
+             RETURNING *`,
+            [id, clientId]
+        );
+        return res.rows[0] || null;
+    },
+
+    // emoji === null removes this sender's reaction
+    async react(id, tag, emoji) {
+        if (!chatDbReady) {
+            const row = memoryChat.rows.find((r) => r.id === id && !r.deleted);
+            if (!row) return null;
+            const next = { ...row.reactions };
+            if (emoji) next[tag] = emoji;
+            else delete next[tag];
+            row.reactions = next;
+            return row;
+        }
+        const res = emoji
+            ? await pool.query(
+                  `UPDATE messages SET reactions = COALESCE(reactions, '{}'::jsonb) || jsonb_build_object($2::text, $3::text)
+                   WHERE id = $1 AND deleted IS NOT TRUE RETURNING *`,
+                  [id, tag, emoji]
+              )
+            : await pool.query(
+                  `UPDATE messages SET reactions = COALESCE(reactions, '{}'::jsonb) - $2::text
+                   WHERE id = $1 AND deleted IS NOT TRUE RETURNING *`,
+                  [id, tag]
+              );
+        return res.rows[0] || null;
+    },
+
+    // Marks other people's messages up to upToId as seen; returns the ids that changed
+    async markSeen(upToId, clientId) {
+        if (!chatDbReady) {
+            const ids = [];
+            memoryChat.rows.forEach((r) => {
+                if (r.id <= upToId && !r.seen && r.sender_id !== clientId) {
+                    r.seen = true;
+                    ids.push(r.id);
+                }
+            });
+            return ids;
+        }
+        const res = await pool.query(
+            `UPDATE messages SET seen = TRUE
+             WHERE id <= $1 AND seen IS NOT TRUE AND sender_id IS DISTINCT FROM $2
+             RETURNING id`,
+            [upToId, clientId]
+        );
+        return res.rows.map((r) => r.id);
+    },
+};
+
+const recentClientKeys = new Map(); // clientId:client_key -> saved message
+
+function broadcastPresence() {
+    const people = new Set();
+    io.of('/').sockets.forEach((s) => people.add(s.data.clientId));
+    io.emit('presence', { online: people.size });
+}
+
 io.on('connection', async (socket) => {
-    console.log('A user connected to chat');
-    
+    const rawId = socket.handshake.auth && socket.handshake.auth.clientId;
+    const clientId = typeof rawId === 'string' && /^[\w-]{8,64}$/.test(rawId) ? rawId : 'anon-' + socket.id;
+    const tag = senderTag(clientId);
+    socket.data.clientId = clientId;
+
+    socket.emit('session', { sender: tag, reactions: CHAT_REACTIONS, persistent: chatDbReady });
+    broadcastPresence();
+
     try {
-        // Send existing messages to new user from DB
-        const res = await pool.query(`
-            SELECT 
-                id, 
-                username as user, 
-                text, 
-                media_url as media, 
-                media_type, 
-                reply_to_id, 
-                reply_to_user, 
-                reply_to_text, 
-                timestamp 
-            FROM messages 
-            ORDER BY timestamp ASC 
-            LIMIT 100
-        `);
-        socket.emit('chat history', res.rows);
+        const rows = await chatStore.recent();
+        socket.emit('chat history', rows.map(publicMessage));
     } catch (err) {
         console.error('Error fetching chat history:', err);
     }
 
-    socket.on('chat message', async (msg) => {
+    let recentSends = [];
+    socket.on('chat message', async (msg, ack) => {
+        const reply = typeof ack === 'function' ? ack : () => {};
+        const now = Date.now();
+        recentSends = recentSends.filter((t) => now - t < 10000);
+        if (recentSends.length >= 15) {
+            return reply({ ok: false, error: 'You are sending messages too fast. Wait a moment.' });
+        }
+        // A resend after a reconnect or timeout carries the same client_key: answer with the saved copy
+        const dedupeKey =
+            msg && typeof msg.client_key === 'string' && /^[\w-]{1,40}$/.test(msg.client_key)
+                ? clientId + ':' + msg.client_key
+                : null;
+        if (dedupeKey && recentClientKeys.has(dedupeKey)) {
+            return reply({ ok: true, message: recentClientKeys.get(dedupeKey) });
+        }
+        const clean = sanitizeIncoming(msg);
+        if (!clean) return reply({ ok: false, error: 'Message was empty or invalid.' });
+        recentSends.push(now);
         try {
-            const res = await pool.query(
-                `INSERT INTO messages (
-                    username, 
-                    text, 
-                    media_url, 
-                    media_type, 
-                    reply_to_id, 
-                    reply_to_user, 
-                    reply_to_text
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7) 
-                RETURNING 
-                    id, 
-                    username as user, 
-                    text, 
-                    media_url as media, 
-                    media_type, 
-                    reply_to_id, 
-                    reply_to_user, 
-                    reply_to_text, 
-                    timestamp`,
-                [
-                    msg.user || 'Anonymous', 
-                    msg.text || null, 
-                    msg.media || null, 
-                    msg.media_type || 'text',
-                    msg.reply_to_id || null,
-                    msg.reply_to_user || null,
-                    msg.reply_to_text || null
-                ]
-            );
-            io.emit('chat message', res.rows[0]);
+            const out = publicMessage(await chatStore.insert(clean, clientId));
+            if (dedupeKey) {
+                recentClientKeys.set(dedupeKey, out);
+                if (recentClientKeys.size > 1000) recentClientKeys.delete(recentClientKeys.keys().next().value);
+            }
+            reply({ ok: true, message: out });
+            socket.broadcast.emit('chat message', out);
         } catch (err) {
             console.error('Error saving chat message:', err);
+            reply({ ok: false, error: 'Could not send message. Try again.' });
+        }
+    });
+
+    socket.on('typing', (state) => {
+        socket.broadcast.emit('typing', {
+            id: socket.id,
+            user: cleanString(state && state.user, 40) || 'Someone',
+            typing: !!(state && state.typing),
+        });
+    });
+
+    socket.on('delete message', async (data, ack) => {
+        const reply = typeof ack === 'function' ? ack : () => {};
+        const id = Number(data && data.id);
+        if (!Number.isInteger(id)) return reply({ ok: false });
+        try {
+            const row = await chatStore.remove(id, clientId);
+            if (!row) return reply({ ok: false, error: 'You can only delete your own messages.' });
+            io.emit('message updated', publicMessage(row));
+            reply({ ok: true });
+        } catch (err) {
+            console.error('Error deleting chat message:', err);
+            reply({ ok: false, error: 'Could not delete message.' });
+        }
+    });
+
+    socket.on('react', async (data, ack) => {
+        const reply = typeof ack === 'function' ? ack : () => {};
+        const id = Number(data && data.id);
+        const emoji = data ? data.emoji : undefined;
+        if (!Number.isInteger(id) || (emoji !== null && !CHAT_REACTIONS.includes(emoji))) return reply({ ok: false });
+        try {
+            const row = await chatStore.react(id, tag, emoji);
+            if (!row) return reply({ ok: false });
+            io.emit('message updated', publicMessage(row));
+            reply({ ok: true });
+        } catch (err) {
+            console.error('Error saving reaction:', err);
+            reply({ ok: false });
+        }
+    });
+
+    socket.on('seen', async (data) => {
+        const upTo = Number(data && data.upTo);
+        if (!Number.isInteger(upTo)) return;
+        try {
+            const ids = await chatStore.markSeen(upTo, clientId);
+            if (ids.length) io.emit('messages seen', { ids });
+        } catch (err) {
+            console.error('Error marking messages seen:', err);
         }
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected from chat');
+        socket.broadcast.emit('typing', { id: socket.id, typing: false });
+        broadcastPresence();
     });
 });
 
@@ -303,6 +520,9 @@ if (!API_ONLY) {
     app.get('/store*', (req, res) => {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
+} else {
+    // Chat media stored on disk (when Supabase Storage is not configured)
+    app.use('/uploads', express.static('uploads'));
 }
 
 // Authentication middleware
@@ -540,12 +760,17 @@ app.post('/api/payments/create-checkout-session', async (req, res) => {
 });
 
 // Endpoint for chat media upload
-app.post('/api/chat/upload', upload.single('file'), (req, res) => {
+app.post('/api/chat/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    const mediaUrl = `/uploads/chat/${req.file.filename}`;
-    res.json({ success: true, mediaUrl });
+    try {
+        const mediaUrl = await storeChatUpload(req.file);
+        res.json({ success: true, mediaUrl });
+    } catch (err) {
+        console.error('Chat upload failed:', err.message);
+        res.status(502).json({ success: false, message: 'Could not store the file. Try again.' });
+    }
 });
 
 // Error handling middleware
