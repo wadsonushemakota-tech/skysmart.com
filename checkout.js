@@ -215,9 +215,23 @@
 
     function showConfirmation(order, data) {
         const first = (order.customerName || '').split(' ')[0];
-        const proofText = order.paymentMethod === 'cash'
-            ? `Hi Wadson! I've placed order ${order.code} (${money(order.subtotal)}) and will pay cash on ${data.delivery.method === 'delivery' ? 'delivery' : 'collection'}.`
-            : `Hi Wadson! I've placed order ${order.code} (${money(order.subtotal)}). Here is my proof of payment:`;
+        const delivery = data.delivery.method === 'delivery';
+        // Full order details, so the owner has everything even from this one message
+        const proofText = [
+            `Hi Wadson! I've placed order ${order.code}.`,
+            '',
+            ...order.items.map((i) => `• ${i.qty} x ${i.name} (size ${i.size}): ${money(i.price * i.qty)}`),
+            `Total: ${money(order.subtotal)}${delivery ? ' + delivery' : ''}`,
+            '',
+            `Name: ${data.customer.name}`,
+            `Phone: ${data.customer.phone}`,
+            delivery ? `Deliver to: ${[data.delivery.address, data.delivery.city].filter(Boolean).join(', ')}` : 'Collection in Bulawayo',
+            `Payment: ${PAYMENT_LABEL[order.paymentMethod]}`,
+            '',
+            order.paymentMethod === 'cash'
+                ? `I'll pay cash on ${delivery ? 'delivery' : 'collection'}.`
+                : 'Here is my proof of payment:',
+        ].join('\n');
         const trackHref = `track.html?code=${encodeURIComponent(order.code)}&phone=${encodeURIComponent(data.customer.phone)}`;
         const el = $('#confirmation');
         el.innerHTML = `

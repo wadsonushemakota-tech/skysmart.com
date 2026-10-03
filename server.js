@@ -826,6 +826,54 @@ function validateOrder(body) {
     };
 }
 
+// WhatsApp alert to the owner for each new order, via CallMeBot (https://www.callmebot.com).
+// Needs CALLMEBOT_APIKEY, which the owner gets once by messaging CallMeBot from their WhatsApp.
+const OWNER_WHATSAPP = (process.env.OWNER_WHATSAPP || catalog.business.whatsapp).replace(/\D/g, '');
+const CALLMEBOT_APIKEY = (process.env.CALLMEBOT_APIKEY || '').trim();
+const CALLMEBOT_URL = process.env.CALLMEBOT_URL || 'https://api.callmebot.com/whatsapp.php';
+const SITE_URL = (process.env.PUBLIC_SITE_URL || String(process.env.CORS_ORIGIN || '').split(',')[0] || '').trim().replace(/\/+$/, '');
+
+function orderAlertText(row) {
+    const money = (n) => '$' + Number(n).toFixed(2).replace(/\.00$/, '');
+    const delivery = row.delivery_method === 'delivery'
+        ? `Deliver to: ${[row.address, row.city].filter(Boolean).join(', ')} (fee to confirm)`
+        : 'Collection in Bulawayo';
+    const payment = { ecocash: 'EcoCash', bank: 'Bank transfer', cash: 'Cash' }[row.payment_method] || row.payment_method;
+    return [
+        `🛍️ NEW SKY SMART ORDER ${row.code}`,
+        `Total: ${money(row.subtotal)}${row.delivery_method === 'delivery' ? ' + delivery' : ''}`,
+        '',
+        `Customer: ${row.customer_name}`,
+        `Phone: ${row.phone}`,
+        row.email ? `Email: ${row.email}` : null,
+        delivery,
+        `Payment: ${payment}`,
+        '',
+        'Items:',
+        ...row.items.map((i) => `• ${i.qty} x ${i.name} (size ${i.size}) ${money(i.price * i.qty)}`),
+        row.notes ? `\nNote: ${row.notes}` : null,
+        SITE_URL ? `\nManage: ${SITE_URL}/admin.html` : null,
+    ].filter((l) => l !== null).join('\n');
+}
+
+async function notifyOwnerOfOrder(row) {
+    if (!CALLMEBOT_APIKEY || !OWNER_WHATSAPP) return;
+    const url = `${CALLMEBOT_URL}?phone=%2B${OWNER_WHATSAPP}` +
+        `&text=${encodeURIComponent(orderAlertText(row))}&apikey=${encodeURIComponent(CALLMEBOT_APIKEY)}`;
+    try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+        const body = await res.text();
+        // CallMeBot answers with an HTML page saying "Message queued" on success
+        if (!res.ok || !/queued|sent/i.test(body)) {
+            console.error(`WhatsApp order alert for ${row.code} may have failed: HTTP ${res.status} ${body.replace(/<[^>]+>/g, ' ').slice(0, 200)}`);
+        } else {
+            console.log(`📲 WhatsApp alert sent for ${row.code}`);
+        }
+    } catch (err) {
+        console.error(`WhatsApp order alert for ${row.code} failed:`, err.message);
+    }
+}
+
 function publicOrder(row) {
     return {
         code: row.code,
@@ -873,6 +921,7 @@ app.post('/api/orders', async (req, res) => {
         recent.push(now);
         recentOrdersByIp.set(ip, recent);
         console.log(`🛍  New order ${row.code}: $${row.subtotal} via ${row.payment_method}`);
+        notifyOwnerOfOrder(row); // fire-and-forget; never delays or fails the customer's order
         res.status(201).json({ success: true, order: publicOrder(row) });
     } catch (err) {
         console.error('Order save failed:', err.message);

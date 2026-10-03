@@ -183,3 +183,17 @@ Products and prices live in **`catalog.js`** (used by the website *and* the serv
 4. Commit and push: Vercel and Render redeploy automatically.
 
 Payment details (EcoCash number, bank accounts) are in the `business` section at the bottom of `catalog.js`.
+
+### WhatsApp alert for every new order
+
+The server sends the owner a WhatsApp message with the full order (items, sizes, customer, delivery,
+payment) the moment an order is placed. It uses the free **CallMeBot** service:
+
+1. Follow the steps on https://www.callmebot.com/blog/free-api-whatsapp-messages/ **from the owner's
+   WhatsApp (0774460966)**: save their number, send them the activation message, and wait for the reply
+   with your **API key**.
+2. On Render → `sky-smart-api` → Environment, set `CALLMEBOT_APIKEY` to that key
+   (and `PUBLIC_SITE_URL=https://skysmart-com.vercel.app`).
+3. The WhatsApp number that receives alerts is `business.whatsapp` in `catalog.js` (override with `OWNER_WHATSAPP`).
+
+Without the key, ordering still works; you then see orders in `/admin.html` and in the customer's WhatsApp message.

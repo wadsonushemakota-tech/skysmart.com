@@ -87,7 +87,7 @@
                     <h3>Prefer to talk?</h3>
                     <p>Call or message us directly. We're happy to help you shape your idea.</p>
                     <a class="project-contact" href="tel:+263777076575"><ion-icon name="call-outline"></ion-icon><span><strong>Call us</strong>${escapeHtml(biz.phoneDisplay)}</span></a>
-                    <a class="project-contact" href="https://wa.me/${biz.whatsapp}" target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon><span><strong>WhatsApp</strong>${escapeHtml(biz.phoneDisplay)}</span></a>
+                    <a class="project-contact" href="https://wa.me/${biz.whatsapp}" target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon><span><strong>WhatsApp</strong>${escapeHtml(biz.whatsappDisplay)}</span></a>
                     <a class="project-contact" href="mailto:${escapeHtml(biz.email)}"><ion-icon name="mail-outline"></ion-icon><span><strong>Email</strong>${escapeHtml(biz.email)}</span></a>
                     <p class="project-where"><ion-icon name="location-outline"></ion-icon> ${escapeHtml(biz.city)}</p>
                 </aside>

@@ -41,8 +41,9 @@
 
     const business = {
         name: 'Sky Smart',
-        whatsapp: '263777076575',
-        phoneDisplay: '+263 77 707 6575',
+        whatsapp: '263774460966', // WhatsApp chats and order alerts
+        whatsappDisplay: '+263 77 446 0966',
+        phoneDisplay: '+263 77 707 6575', // phone calls
         email: 'wadsonushemakota@gmail.com',
         city: 'Bulawayo, Zimbabwe',
         payment: {
