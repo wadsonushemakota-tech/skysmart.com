@@ -549,6 +549,17 @@ app.get('/api/health', (req, res) => {
     res.json({ ok: true, apiOnly: API_ONLY, uptime: process.uptime() });
 });
 
+// Pinged on a schedule (.github/workflows/keep-awake.yml) so the free server doesn't sleep in business
+// hours, and the database query counts as activity so Supabase's free project never pauses.
+app.get('/api/keepalive', async (req, res) => {
+    try {
+        await pool.query('SELECT 1');
+        res.json({ ok: true, db: true, uptime: Math.round(process.uptime()) });
+    } catch (err) {
+        res.status(503).json({ ok: false, db: false, message: err.message });
+    }
+});
+
 // Search products
 app.get('/api/search', async (req, res) => {
     try {
