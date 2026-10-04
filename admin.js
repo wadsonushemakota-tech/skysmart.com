@@ -3,11 +3,21 @@
     const { money, escapeHtml, toast } = window.SkyShop;
     const $ = (sel) => document.querySelector(sel);
     const KEY_STORE = 'skySmartAdminKey';
+    const SEEN_STORE = 'skySmartSeenOrders';
+    const POLL_MS = 30000;
     const apiUrl = (p) => (typeof window.skySmartApiUrl === 'function' ? window.skySmartApiUrl(p) : p);
-    let adminKey = sessionStorage.getItem(KEY_STORE) || '';
+    // Remembered on this device (the owner's phone) so the installed app opens straight to the orders
+    const store = {
+        get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } },
+        del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+    };
+    let adminKey = store.get(KEY_STORE) || '';
     let orders = [];
     let filter = '';
     let timer = null;
+    let seen = null; // order codes already known on this device; null until the first load
+    const fresh = new Set(); // orders that arrived while the dashboard was open
 
     const STATUS_LABEL = {
         pending_payment: 'Awaiting payment', paid: 'Paid', ready: 'Ready for collection',
@@ -67,7 +77,7 @@
         $('#stat-out').textContent = orders.filter((o) => o.status === 'ready' || o.status === 'shipped').length;
         $('#stat-revenue').textContent = money(orders.filter((o) => ['paid', 'ready', 'shipped', 'completed'].includes(o.status)).reduce((s, o) => s + o.subtotal, 0));
         $('#orders').innerHTML = list.length ? list.map((o) => `
-            <article class="order-row" data-code="${escapeHtml(o.code)}">
+            <article class="order-row${fresh.has(o.code) ? ' is-new' : ''}" data-code="${escapeHtml(o.code)}">
                 <div class="order-row-head">
                     <h3>${escapeHtml(o.code)} · ${money(o.subtotal)}</h3>
                     <span class="status status-${escapeHtml(o.status)}">${escapeHtml(STATUS_LABEL[o.status] || o.status)}</span>
@@ -95,6 +105,7 @@
         try {
             const body = await api('/api/admin/orders');
             orders = body.orders;
+            detectNewOrders();
             render();
             $('#refreshed').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return true;
@@ -112,15 +123,133 @@
     function showDashboard() {
         $('#admin-login').hidden = true;
         $('#dashboard').hidden = false;
+        alertsStatus();
         load();
         clearInterval(timer);
-        timer = setInterval(load, 60000);
+        timer = setInterval(load, POLL_MS);
     }
+
+    // ---------- New-order alerts: chime, notification, title badge, highlighted rows ----------
+    function detectNewOrders() {
+        if (seen === null) {
+            // First load on this device: remember what exists; alert only for orders newer than last visit
+            let saved = null;
+            try { saved = JSON.parse(store.get(SEEN_STORE) || 'null'); } catch (e) { /* ignore */ }
+            seen = new Set(saved || orders.map((o) => o.code));
+        }
+        const arrived = orders.filter((o) => !seen.has(o.code));
+        arrived.forEach((o) => { seen.add(o.code); fresh.add(o.code); });
+        store.set(SEEN_STORE, JSON.stringify(Array.from(seen).slice(-500)));
+        if (arrived.length) announce(arrived);
+        updateTitle();
+    }
+
+    function updateTitle() {
+        document.title = (fresh.size ? `(${fresh.size}) New order${fresh.size > 1 ? 's' : ''} · ` : '') + 'Orders Dashboard | Sky Smart';
+    }
+
+    let audioCtx = null;
+    function chime() {
+        try {
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            // Three rising notes
+            [659.25, 783.99, 1046.5].forEach((freq, i) => {
+                const t = audioCtx.currentTime + i * 0.18;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.0001, t);
+                gain.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.5);
+            });
+        } catch (e) { /* sound not available */ }
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    async function notify(title, body) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        const options = { body, icon: 'images/app-icon-192.png', badge: 'images/app-icon-192.png', tag: 'sky-smart-order', renotify: true };
+        try {
+            // Android Chrome only allows notifications through the service worker
+            const reg = navigator.serviceWorker && (await navigator.serviceWorker.getRegistration());
+            if (reg) return reg.showNotification(title, options);
+            new Notification(title, options);
+        } catch (e) { /* ignore */ }
+    }
+
+    function announce(arrived) {
+        chime();
+        const first = arrived[0];
+        const title = arrived.length === 1
+            ? `🛍️ New order ${first.code}: ${money(first.subtotal)}`
+            : `🛍️ ${arrived.length} new orders`;
+        const body = arrived.length === 1
+            ? `${first.customerName}: ${first.items.map((i) => `${i.qty}× ${i.name} (size ${i.size})`).join(', ')}`
+            : arrived.map((o) => `${o.code} ${money(o.subtotal)} from ${o.customerName}`).join('\n');
+        notify(title, body);
+        toast(arrived.length === 1 ? `New order ${first.code} from ${first.customerName}` : `${arrived.length} new orders`);
+    }
+
+    function alertsStatus() {
+        const dot = $('#alert-dot');
+        const status = $('#alert-status');
+        const btn = $('#enable-alerts');
+        if (!('Notification' in window)) {
+            status.textContent = 'Sound alerts are on while this page is open. This browser does not support pop-up notifications.';
+            dot.classList.add('on');
+            btn.hidden = true;
+            return;
+        }
+        const p = Notification.permission;
+        dot.classList.toggle('on', p === 'granted');
+        btn.hidden = p === 'granted';
+        status.textContent = p === 'granted'
+            ? `On. Checking every ${POLL_MS / 1000} seconds; you'll hear a chime and get a notification for each new order while the dashboard is open.`
+            : p === 'denied'
+                ? 'Notifications are blocked for this site. Allow them in your browser settings (site settings → Notifications). Sound alerts still work while the page is open.'
+                : 'Off. Turn on to hear a sound and get a notification when an order arrives.';
+    }
+
+    $('#enable-alerts').addEventListener('click', async () => {
+        chime(); // also unlocks sound playback, which browsers only allow after a tap
+        if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission();
+        alertsStatus();
+        if ('Notification' in window && Notification.permission === 'granted') notify('Order alerts are on ✅', "You'll be notified here when a new order arrives.");
+    });
+    $('#test-alert').addEventListener('click', () => {
+        chime();
+        notify('🛍️ Test alert', 'This is how a new order alert will look and sound.');
+    });
+
+    // ---------- Install as an app ----------
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    let installPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        installPrompt = e;
+        $('#install-app').hidden = false;
+    });
+    $('#install-app').addEventListener('click', async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        const choice = await installPrompt.userChoice;
+        if (choice.outcome === 'accepted') toast('Installed! Open "SS Orders" from your home screen.');
+        installPrompt = null;
+        $('#install-app').hidden = true;
+    });
+    window.addEventListener('appinstalled', () => { $('#install-app').hidden = true; });
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone) $('#ios-hint').hidden = false;
 
     function signOut(message) {
         clearInterval(timer);
         adminKey = '';
-        sessionStorage.removeItem(KEY_STORE);
+        store.del(KEY_STORE);
         $('#dashboard').hidden = true;
         $('#admin-login').hidden = false;
         const err = $('#login-error');
@@ -137,7 +266,7 @@
         btn.textContent = 'Signing in…';
         try {
             await api('/api/admin/orders?status=paid');
-            sessionStorage.setItem(KEY_STORE, adminKey);
+            store.set(KEY_STORE, adminKey);
             $('#admin-key').value = '';
             showDashboard();
         } catch (err) {
@@ -146,6 +275,15 @@
             btn.disabled = false;
             btn.textContent = 'Open dashboard';
         }
+    });
+
+    // Tapping a highlighted new order marks it as seen
+    $('#orders').addEventListener('click', (e) => {
+        const row = e.target.closest('.order-row.is-new');
+        if (!row) return;
+        fresh.delete(row.dataset.code);
+        row.classList.remove('is-new');
+        updateTitle();
     });
 
     $('#orders').addEventListener('click', async (e) => {

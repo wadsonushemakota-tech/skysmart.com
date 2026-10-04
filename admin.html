@@ -16,6 +16,10 @@
 <link rel="stylesheet" href="site.css">
 
 <meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="admin-manifest.json">
+<link rel="apple-touch-icon" href="images/app-icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SS Orders">
 </head>
 <body>
 <a class="visually-hidden" href="#main">Skip to content</a>
@@ -55,6 +59,10 @@
     <div class="wrap">
         <h1 style="font-size:2.2rem">Orders dashboard</h1>
         <p>Private page for Sky Smart staff.</p>
+        <div class="install-row">
+            <button type="button" class="btn btn-gold btn-sm" id="install-app" hidden><ion-icon name="download-outline"></ion-icon> Install as app</button>
+            <p class="install-hint" id="ios-hint" hidden>On iPhone: tap <strong>Share</strong> then <strong>Add to Home Screen</strong>.</p>
+        </div>
     </div>
 </section>
 
@@ -70,6 +78,16 @@
     </form>
 
     <div id="dashboard" hidden>
+        <div class="alert-setup">
+            <div class="alert-setup-text">
+                <span class="alert-dot" id="alert-dot"></span>
+                <div><strong>New-order alerts</strong><span id="alert-status">Off. Turn on to hear a sound and get a notification when an order arrives.</span></div>
+            </div>
+            <div class="alert-setup-actions">
+                <button type="button" class="btn btn-gold btn-sm" id="enable-alerts"><ion-icon name="notifications-outline"></ion-icon> Turn on order alerts</button>
+                <button type="button" class="btn btn-outline btn-sm" id="test-alert"><ion-icon name="volume-high-outline"></ion-icon> Test sound</button>
+            </div>
+        </div>
         <div class="stat-row">
             <div class="stat"><span>Awaiting payment</span><strong id="stat-pending">0</strong></div>
             <div class="stat"><span>Paid, to prepare</span><strong id="stat-paid">0</strong></div>

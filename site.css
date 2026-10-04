@@ -895,3 +895,24 @@ a.sponsor-way:hover { border-color: var(--gold); transform: translateX(4px); box
 @media (max-width: 600px) {
     .sponsor-give { flex-direction: column; gap: 12px; }
 }
+
+/* ---------- Orders dashboard: alerts + install ---------- */
+.install-row { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.install-hint { margin: 0; font-size: 14px; color: var(--gold-soft); }
+.alert-setup {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;
+    padding: 16px 20px; margin-bottom: 18px; border-radius: 16px; background: #fff; border: 1px solid #ecd9a6;
+}
+.alert-setup-text { display: flex; gap: 12px; align-items: flex-start; flex: 1; min-width: 240px; }
+.alert-setup-text strong { display: block; color: var(--navy); }
+.alert-setup-text span:not(.alert-dot) { font-size: 14px; color: var(--muted); }
+.alert-dot { width: 12px; height: 12px; border-radius: 50%; background: #c5cbd8; margin-top: 5px; flex-shrink: 0; }
+.alert-dot.on { background: var(--success); box-shadow: 0 0 0 4px rgba(21, 128, 61, .18); }
+.alert-setup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.order-row.is-new { border: 2px solid var(--gold); background: #fffaf0; animation: newOrder 1.2s ease 2; cursor: pointer; }
+.order-row.is-new .order-row-head h3::after {
+    content: 'NEW'; margin-left: 10px; padding: 2px 8px; border-radius: 999px; background: var(--gold); color: var(--navy-deep);
+    font-size: 11px; letter-spacing: .08em; vertical-align: middle;
+}
+@keyframes newOrder { 50% { box-shadow: 0 0 0 6px rgba(212, 173, 85, .35); } }
+@media (max-width: 600px) { .alert-setup-actions .btn { flex: 1 1 100%; } }
